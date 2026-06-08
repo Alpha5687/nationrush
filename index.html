@@ -82,7 +82,7 @@ window.addEventListener('appinstalled', function() {
 <!-- Supabase JS officiel — gère auth + Realtime correctement -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <!-- ADSTERRA Social Bar — chargé dès le démarrage -->
-<script src="https://pl29652282.effectivecpmnetwork.com/c6/b4/41/c6b44129f646ac6d9b6458758b769e60.js"></script>
+<script src="https://pl29682872.effectivecpmnetwork.com/e8/f6/a3/e8f6a37ac85ee36fd6c9174c8f136962.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;overflow:hidden;background:#08111f;color:#fff;
@@ -2300,8 +2300,8 @@ body.rtl .rrow{flex-direction:row-reverse}
         <!-- Remplacer ce bloc par le code AdSense quand disponible -->
         <div id="ad-iframe-container" style="width:100%;min-height:200px">
           <!-- ADSTERRA Native Banner -->
-          <script async="async" data-cfasync="false" src="https://pl29652350.effectivecpmnetwork.com/7613da2646382666a6fd1be21e6052d8/invoke.js"></script>
-          <div id="container-7613da2646382666a6fd1be21e6052d8"></div>
+          <script async="async" data-cfasync="false" src="https://pl29682873.effectivecpmnetwork.com/05a0c85f7f4edebcd0ebf4a2573318e8/invoke.js"></script>
+          <div id="container-05a0c85f7f4edebcd0ebf4a2573318e8"></div>
         </div>
       </div>
 
@@ -4274,7 +4274,9 @@ async function doSignup(){
 
   // Detecter si inscription via lien affilié (URL en priorité, puis localStorage)
   var _urlParams = new URLSearchParams(window.location.search);
-  var _urlCreator = (_urlParams.get('creator') && _urlParams.get('type')==='affiliate') ? _urlParams.get('creator') : '';
+  var _urlInv=_urlParams.get('inv')||'',_urlRef2=_urlParams.get('ref')||'',_urlType2=_urlParams.get('type')||'';
+  var _urlCreator = (_urlParams.get('creator')&&_urlType2==='affiliate') ? _urlParams.get('creator') :
+                   (_urlRef2&&_urlType2==='friend'&&_urlInv==='---creator') ? _urlRef2 : '';
   var pendingCreator = _urlCreator || localStorage.getItem('nr_pending_creator') || '';
   var isAffiliate = !!(pendingCreator || localStorage.getItem('nr_is_affiliate'));
 
@@ -4351,7 +4353,9 @@ async function doLogin(){
 function _applyPendingAffiliateToUser(){
   if(!U) return;
   var _urlParams2 = new URLSearchParams(window.location.search);
-  var _urlCreator2 = (_urlParams2.get('creator') && _urlParams2.get('type')==='affiliate') ? _urlParams2.get('creator') : '';
+  var _urlInv2=_urlParams2.get('inv')||'',_urlRef3=_urlParams2.get('ref')||'',_urlType3=_urlParams2.get('type')||'';
+  var _urlCreator2 = (_urlParams2.get('creator')&&_urlType3==='affiliate') ? _urlParams2.get('creator') :
+                    (_urlRef3&&_urlType3==='friend'&&_urlInv2==='---creator') ? _urlRef3 : '';
   var pendingCreator = _urlCreator2 || localStorage.getItem('nr_pending_creator');
   var isAff = localStorage.getItem('nr_is_affiliate');
   if(pendingCreator && !U.appliedCreator){
@@ -4554,7 +4558,7 @@ function _loadAdContent(){
   // ── Native Banner : déjà dans le HTML statique
   //    Fallback simulation si vide après 5s ──
   setTimeout(function(){
-    const nbDiv = document.getElementById('container-7613da2646382666a6fd1be21e6052d8');
+    const nbDiv = document.getElementById('container-05a0c85f7f4edebcd0ebf4a2573318e8');
     const container = document.getElementById('ad-iframe-container');
     if(nbDiv && nbDiv.children.length === 0 && container){
       _loadSimulatedAd(container);
@@ -6042,7 +6046,7 @@ function showWin(winner,me,iWon,coins){
 
   // Copier le Native Banner dans l'écran de résultats
   setTimeout(function(){
-    const src = document.getElementById('container-7613da2646382666a6fd1be21e6052d8');
+    const src = document.getElementById('container-05a0c85f7f4edebcd0ebf4a2573318e8');
     const dst = document.getElementById('container-win-7613da2646382666a6fd1be21e6052d8');
     if(src && dst && src.innerHTML.trim() !== ''){
       dst.innerHTML = src.innerHTML;
@@ -6197,11 +6201,19 @@ window.addEventListener('load',()=>{
       if(changed){ saveU(); updateMenu(); }
     }catch(e){}
   }, 30000); // every 30 seconds
-  // Detect referral code in URL (?ref=NRXXXXX)
+  // Detect referral/affiliate code in URL
   try{
     const params=new URLSearchParams(window.location.search);
     const ref=params.get('ref');
-    if(ref){
+    const creator=params.get('creator');
+    const type=params.get('type')||'';
+    const inv=params.get('inv')||'';
+    // Affiliate link: ?creator=CODE&type=affiliate OR ?ref=CODE&type=friend&inv=---creator
+    if((creator&&type==='affiliate')||(ref&&type==='friend'&&inv==='---creator')){
+      const affCode=creator||ref;
+      localStorage.setItem('nr_pending_creator',affCode);
+      localStorage.setItem('nr_is_affiliate','true');
+    } else if(ref){
       localStorage.setItem('nr_pending_ref',ref);
     }
   }catch(e){}
@@ -7726,12 +7738,17 @@ async function _loadAffiliateLineage(){
         } else if(apiData && typeof apiData.revenue!=='undefined'){
           totalRevenue=parseFloat(apiData.revenue)||0;
         }
-        // Commission = 2% du revenu total proportionnel aux pubs de la lignée
-        var totalAdsAll=totalAds; // pubs de la lignée de cet affilié
-        // Revenu de cet affilié = sa part proportionnelle * 2%
-        var commission=(totalRevenue*AFFILIATE_RATE).toFixed(4);
+        // Commission proportionnelle : (pubs lignée / pubs site total) * revenus site * 2%
+        // Récupérer le total des pubs vues sur tout le site pour ce mois
+        var totalSiteAds=0;
+        try{
+          var siteStatsRows=await sbFetch('nr_ad_views?select=ref_code&limit=10000')||[];
+          totalSiteAds=siteStatsRows.length||1;
+        }catch(eSa){totalSiteAds=Math.max(totalAds,1);}
+        var myShare=totalSiteAds>0?totalAds/totalSiteAds:0;
+        var commission=(totalRevenue*myShare*AFFILIATE_RATE).toFixed(4);
         $('aff-est-low').textContent='$'+commission;
-        $('aff-est-high').textContent='$'+totalRevenue.toFixed(4)+' (total site)';
+        $('aff-est-high').textContent='$'+totalRevenue.toFixed(2)+' (revenu site)';
         // Mettre à jour le libellé
         var lowLbl=document.querySelector('#aff-revenue-section .rsl');
         var noteEl=document.querySelector('#aff-revenue-section .rsv + .rsl + div');
@@ -8050,9 +8067,13 @@ function applyPendingRef(){
     const creator=params.get('creator');
     const type=params.get('type');
 
-    if(creator&&type==='affiliate'){
+    var inv=params.get('inv')||'';
+    // Lien AFFILIÉ : ?creator=CODE&type=affiliate OU ?ref=CODE&type=friend&inv=---creator
+    var isCreatorLink=(creator&&type==='affiliate')||(ref&&type==='friend'&&inv==='---creator');
+    var creatorRefCode=creator||ref||'';
+    if(isCreatorLink&&creatorRefCode){
       // Lien AFFILIÉ — marquer cette personne comme affiliée
-      localStorage.setItem('nr_pending_creator', creator);
+      localStorage.setItem('nr_pending_creator', creatorRefCode);
       localStorage.setItem('nr_is_affiliate', 'true');
       toast(t('toast_welcome_affiliate'));
     } else if(ref&&(type==='friend'||!type)){
