@@ -1176,6 +1176,48 @@ body.rtl .rrow{flex-direction:row-reverse}
       <div style="font-size:1.1rem;color:#8899AA">›</div>
     </div>
 
+
+    <div style="font-size:.8rem;letter-spacing:2px;color:#8899AA;margin:10px 0 5px;font-weight:700" data-tr="menu_games_section">🎮 MINI-JEUX</div>
+
+    <div class="mc" style="background:rgba(255,215,0,.05);border-color:rgba(255,215,0,.25)" onclick="goMorpion()">
+      <div class="mi">⭕</div>
+      <div style="flex:1">
+        <div class="mt2" style="color:#FFD700" data-tr="morpion_title">Morpion</div>
+        <div class="md" data-tr="morpion_desc">2 joueurs • Même écran • Ou vs IA</div>
+        <div class="ml" style="color:#00E676">✅ GRATUIT</div>
+      </div>
+      <div style="font-size:1.1rem;color:#8899AA">›</div>
+    </div>
+
+    <div class="mc" style="background:rgba(180,100,255,.05);border-color:rgba(180,100,255,.25)" onclick="goGomoku()">
+      <div class="mi">⚫</div>
+      <div style="flex:1">
+        <div class="mt2" style="color:#CE93D8" data-tr="gomoku_title">Gomoku</div>
+        <div class="md" data-tr="gomoku_desc">5 en ligne • Grille • Ou vs IA</div>
+        <div class="ml" style="color:#00E676">✅ GRATUIT</div>
+      </div>
+      <div style="font-size:1.1rem;color:#8899AA">›</div>
+    </div>
+
+    <div class="mc" style="background:rgba(255,100,50,.05);border-color:rgba(255,100,50,.25)" onclick="goTetris()">
+      <div class="mi">🧱</div>
+      <div style="flex:1">
+        <div class="mt2" style="color:#FF6E40" data-tr="tetris_title">Tetris</div>
+        <div class="md" data-tr="tetris_desc">Solo • Plusieurs niveaux</div>
+        <div class="ml" style="color:#00E676">✅ GRATUIT</div>
+      </div>
+      <div style="font-size:1.1rem;color:#8899AA">›</div>
+    </div>
+
+    <div class="mc" style="background:rgba(100,180,100,.05);border-color:rgba(100,180,100,.25)" onclick="goDamier()">
+      <div class="mi">♟️</div>
+      <div style="flex:1">
+        <div class="mt2" style="color:#81C784" data-tr="damier_title">Damier</div>
+        <div class="md" data-tr="damier_desc">2 joueurs • Même écran • Ou vs IA</div>
+        <div class="ml" style="color:#00E676">✅ GRATUIT</div>
+      </div>
+      <div style="font-size:1.1rem;color:#8899AA">›</div>
+    </div>
     <div style="font-size:.8rem;letter-spacing:2px;color:#8899AA;margin:10px 0 5px;font-weight:700" data-tr="menu_social_section">👥 SOCIAL</div>
 
     <div class="mc" style="background:rgba(255,215,0,.04);border-color:rgba(255,215,0,.2)" onclick="G('pg-ref');loadRef()">
@@ -3128,6 +3170,33 @@ const TXT={
     online_multi_desc:'3-10 joueurs • Chacun son cheval',
     online_2v2_desc:'2 équipes • 2 joueurs tapotent 1 cheval',
     online_team_desc:'2 à 5 contre 2 à 5 • Équipes mondiales',
+    menu_games_section:'🎮 MINI-JEUX',
+    morpion_title:'Titato',morpion_desc:'Tic-Tac-Toe • 2 joueurs • Ou vs IA',
+    morpion_choose_mode:'CHOISIR LE MODE',morpion_2p:'2 Joueurs',morpion_vs_ai:'Vs IA',
+    morpion_restart:'↩ Rejouer',morpion_menu:'Menu',
+    morpion_win:'🏆 Victoire !',morpion_draw:'🤝 Match nul',morpion_lost:'❌ Défaite',
+    tetris_title:'Tetris',tetris_desc:'Solo • Plusieurs niveaux',
+    tetris_score:'SCORE',tetris_lines:'LIGNES',tetris_best:'RECORD',
+    tetris_pause:'⏸ Pause',tetris_restart:'↩ Rejouer',tetris_gameover:'GAME OVER',
+    tetris_swipe_hint:'← → glisser • ↑ tourner • ↓ descendre',
+    damier_title:'Damier',damier_desc:'2 joueurs • Même écran • Ou vs IA',
+    damier_choose_mode:'CHOISIR LE MODE',
+    damier_your_turn:'Votre tour',damier_p1_turn:'Tour Joueur 1',damier_p2_turn:'Tour Joueur 2',
+    damier_ai_thinking:'IA réfléchit...',damier_win:'🏆 Victoire !',damier_lost:'❌ Défaite',
+    mg_create_room:'Créer une room',mg_join_room:'Rejoindre avec code',
+    mg_your_code:'TON CODE DE ROOM',mg_copy_code:'📋 Copier le code',
+    mg_waiting_opponent:'En attente d\'un adversaire...',mg_joined:'a rejoint la room !',
+    mg_start_game:'▶ LANCER LA PARTIE',mg_enter_code:'ENTRER LE CODE DE ROOM',
+    mg_join_btn:'🔗 REJOINDRE',mg_waiting_host:'En attente du lancement par l\'hôte...',
+    mg_online_win:'🏆 Victoire ! +15🪙',mg_online_lost:'❌ Défaite',mg_online_draw:'🤝 Égalité',
+    mg_opponent_left:'L\'adversaire a quitté la partie.',
+    gomoku_title:'Gomoku (Morpion)',gomoku_desc:'5 en ligne • Grande grille • 2 joueurs ou vs IA',
+    gomoku_choose_mode:'CHOISIR LE MODE',gomoku_your_turn:'Votre tour',
+    gomoku_p1_turn:'Tour Joueur 1 (⚫)',gomoku_p2_turn:'Tour Joueur 2 (⚪)',
+    gomoku_ai_thinking:'IA réfléchit...',gomoku_win:'🏆 Victoire !',
+    gomoku_lost:'❌ Défaite',gomoku_draw:'🤝 Match nul',
+    diff_easy:'😊 Facile',diff_normal:'😐 Normal',diff_hard:'😈 Difficile',
+    diff_start_ai:'▶ Jouer vs IA',diff_label:'DIFFICULTÉ',
     coming_soon:'🔜 BIENTÔT',
     // Boutons TAP
     tap_boost:'⚡ TAP TO BOOST',
@@ -3402,6 +3471,33 @@ const TXT={
     online_multi_desc:'3-10 players • Each their own horse',
     online_2v2_desc:'2 teams • 2 players tap 1 horse',
     online_team_desc:'2 to 5 vs 2 to 5 • World teams',
+    menu_games_section:'🎮 MINI-GAMES',
+    morpion_title:'Titato',morpion_desc:'Tic-Tac-Toe • 2 players • Or vs AI',
+    morpion_choose_mode:'CHOOSE MODE',morpion_2p:'2 Players',morpion_vs_ai:'Vs AI',
+    morpion_restart:'↩ Replay',morpion_menu:'Menu',
+    morpion_win:'🏆 Victory!',morpion_draw:'🤝 Draw',morpion_lost:'❌ Defeat',
+    tetris_title:'Tetris',tetris_desc:'Solo • Multiple levels',
+    tetris_score:'SCORE',tetris_lines:'LINES',tetris_best:'BEST',
+    tetris_pause:'⏸ Pause',tetris_restart:'↩ Replay',tetris_gameover:'GAME OVER',
+    tetris_swipe_hint:'← → slide • ↑ rotate • ↓ drop',
+    damier_title:'Checkers',damier_desc:'2 players • Same screen • Or vs AI',
+    damier_choose_mode:'CHOOSE MODE',
+    damier_your_turn:'Your turn',damier_p1_turn:'Player 1 turn',damier_p2_turn:'Player 2 turn',
+    damier_ai_thinking:'AI thinking...',damier_win:'🏆 Victory!',damier_lost:'❌ Defeat',
+    mg_create_room:'Create room',mg_join_room:'Join with code',
+    mg_your_code:'YOUR ROOM CODE',mg_copy_code:'📋 Copy code',
+    mg_waiting_opponent:'Waiting for opponent...',mg_joined:'joined the room!',
+    mg_start_game:'▶ START GAME',mg_enter_code:'ENTER ROOM CODE',
+    mg_join_btn:'🔗 JOIN',mg_waiting_host:'Waiting for host to start...',
+    mg_online_win:'🏆 Victory! +15🪙',mg_online_lost:'❌ Defeat',mg_online_draw:'🤝 Draw',
+    mg_opponent_left:'Opponent left the game.',
+    gomoku_title:'Gomoku (Morpion)',gomoku_desc:'5 in a row • Large grid • 2 players or vs AI',
+    gomoku_choose_mode:'CHOOSE MODE',gomoku_your_turn:'Your turn',
+    gomoku_p1_turn:'Player 1 turn (⚫)',gomoku_p2_turn:'Player 2 turn (⚪)',
+    gomoku_ai_thinking:'AI thinking...',gomoku_win:'🏆 Victory!',
+    gomoku_lost:'❌ Defeat',gomoku_draw:'🤝 Draw',
+    diff_easy:'😊 Easy',diff_normal:'😐 Normal',diff_hard:'😈 Hard',
+    diff_start_ai:'▶ Play vs AI',diff_label:'DIFFICULTY',
     coming_soon:'🔜 COMING SOON',
     tap_boost:'⚡ TAP TO BOOST',
     races_count:'RACES',watch_ad_btn:'WATCH AD +2 🪙',
@@ -3669,6 +3765,33 @@ const TXT={
     online_multi_desc:'3-10 jugadores • Cada uno su caballo',
     online_2v2_desc:'2 equipos • 2 jugadores tocan 1 caballo',
     online_team_desc:'2 a 5 contra 2 a 5 • Equipos mundiales',
+    menu_games_section:'🎮 MINI-JUEGOS',
+    morpion_title:'Titato',morpion_desc:'Tic-Tac-Toe • 2 jugadores • O vs IA',
+    morpion_choose_mode:'ELEGIR MODO',morpion_2p:'2 Jugadores',morpion_vs_ai:'Vs IA',
+    morpion_restart:'↩ Repetir',morpion_menu:'Menú',
+    morpion_win:'🏆 ¡Victoria!',morpion_draw:'🤝 Empate',morpion_lost:'❌ Derrota',
+    tetris_title:'Tetris',tetris_desc:'Solo • Varios niveles',
+    tetris_score:'PUNTOS',tetris_lines:'LÍNEAS',tetris_best:'RÉCORD',
+    tetris_pause:'⏸ Pausa',tetris_restart:'↩ Repetir',tetris_gameover:'FIN DEL JUEGO',
+    tetris_swipe_hint:'← → deslizar • ↑ girar • ↓ bajar',
+    damier_title:'Damas',damier_desc:'2 jugadores • Misma pantalla • O vs IA',
+    damier_choose_mode:'ELEGIR MODO',
+    damier_your_turn:'Tu turno',damier_p1_turn:'Turno Jugador 1',damier_p2_turn:'Turno Jugador 2',
+    damier_ai_thinking:'IA pensando...',damier_win:'🏆 ¡Victoria!',damier_lost:'❌ Derrota',
+    mg_create_room:'Crear sala',mg_join_room:'Unirse con código',
+    mg_your_code:'TU CÓDIGO DE SALA',mg_copy_code:'📋 Copiar código',
+    mg_waiting_opponent:'Esperando oponente...',mg_joined:'se unió a la sala!',
+    mg_start_game:'▶ INICIAR PARTIDA',mg_enter_code:'INGRESAR CÓDIGO',
+    mg_join_btn:'🔗 UNIRSE',mg_waiting_host:'Esperando que el anfitrión inicie...',
+    mg_online_win:'🏆 ¡Victoria! +15🪙',mg_online_lost:'❌ Derrota',mg_online_draw:'🤝 Empate',
+    mg_opponent_left:'El oponente abandonó la partida.',
+    gomoku_title:'Gomoku (Morpion)',gomoku_desc:'5 en línea • Cuadrícula grande • 2 jugadores o vs IA',
+    gomoku_choose_mode:'ELEGIR MODO',gomoku_your_turn:'Tu turno',
+    gomoku_p1_turn:'Turno J1 (⚫)',gomoku_p2_turn:'Turno J2 (⚪)',
+    gomoku_ai_thinking:'IA pensando...',gomoku_win:'🏆 ¡Victoria!',
+    gomoku_lost:'❌ Derrota',gomoku_draw:'🤝 Empate',
+    diff_easy:'😊 Fácil',diff_normal:'😐 Normal',diff_hard:'😈 Difícil',
+    diff_start_ai:'▶ Jugar vs IA',diff_label:'DIFICULTAD',
     coming_soon:'🔜 PRÓXIMAMENTE',
     tap_boost:'⚡ TOCA PARA AVANZAR',
     races_count:'CARRERAS',watch_ad_btn:'VER ANUNCIO +2 🪙',
@@ -3932,6 +4055,33 @@ const TXT={
     online_2v2:'2 ضد 2 أونلاين',online_team:'معركة الفرق أونلاين',
     online_1v1_desc:'لاعبان • أجهزة مختلفة',
     online_multi_desc:'3-10 لاعبين • كل واحد حصانه',
+    menu_games_section:'🎮 ألعاب صغيرة',
+    morpion_title:'تيتاتو',morpion_desc:'تيك-تاك-تو • 2 لاعبين • أو ضد الذكاء',
+    morpion_choose_mode:'اختر النمط',morpion_2p:'لاعبان',morpion_vs_ai:'ضد الذكاء',
+    morpion_restart:'↩ إعادة',morpion_menu:'القائمة',
+    morpion_win:'🏆 فوز!',morpion_draw:'🤝 تعادل',morpion_lost:'❌ خسارة',
+    tetris_title:'تتريس',tetris_desc:'فردي • مستويات متعددة',
+    tetris_score:'النقاط',tetris_lines:'الصفوف',tetris_best:'الأفضل',
+    tetris_pause:'⏸ توقف',tetris_restart:'↩ إعادة',tetris_gameover:'انتهت اللعبة',
+    tetris_swipe_hint:'← → انزلاق • ↑ تدوير • ↓ نزول',
+    damier_title:'الداما',damier_desc:'2 لاعبين • نفس الشاشة • أو ضد الذكاء',
+    damier_choose_mode:'اختر النمط',
+    damier_your_turn:'دورك',damier_p1_turn:'دور اللاعب 1',damier_p2_turn:'دور اللاعب 2',
+    damier_ai_thinking:'الذكاء يفكر...',damier_win:'🏆 فوز!',damier_lost:'❌ خسارة',
+    mg_create_room:'إنشاء غرفة',mg_join_room:'الانضمام برمز',
+    mg_your_code:'رمز غرفتك',mg_copy_code:'📋 نسخ الرمز',
+    mg_waiting_opponent:'في انتظار الخصم...',mg_joined:'انضم إلى الغرفة!',
+    mg_start_game:'▶ بدء اللعبة',mg_enter_code:'أدخل رمز الغرفة',
+    mg_join_btn:'🔗 انضم',mg_waiting_host:'في انتظار المضيف...',
+    mg_online_win:'🏆 فوز! +15🪙',mg_online_lost:'❌ خسارة',mg_online_draw:'🤝 تعادل',
+    mg_opponent_left:'غادر الخصم اللعبة.',
+    gomoku_title:'غوموكو (مورپيون)',gomoku_desc:'5 في صف • شبكة • لاعبان أو ضد الذكاء',
+    gomoku_choose_mode:'اختر النمط',gomoku_your_turn:'دورك',
+    gomoku_p1_turn:'دور اللاعب 1 (⚫)',gomoku_p2_turn:'دور اللاعب 2 (⚪)',
+    gomoku_ai_thinking:'الذكاء يفكر...',gomoku_win:'🏆 فوز!',
+    gomoku_lost:'❌ خسارة',gomoku_draw:'🤝 تعادل',
+    diff_easy:'😊 سهل',diff_normal:'😐 عادي',diff_hard:'😈 صعب',
+    diff_start_ai:'▶ العب ضد الذكاء',diff_label:'الصعوبة',
     coming_soon:'🔜 قريباً',
     tap_boost:'⚡ انقر للتعزيز',
     races_count:'سباقات',races_label:'سباقات',watch_ad_btn:'شاهد إعلاناً +2 🪙',
@@ -8439,7 +8589,7 @@ async function openAffPayments(){
     }
 
     var html='';
-    for(var u of users){
+    for(var _ui=0;_ui<users.length;_ui++){ var u=users[_ui];
       if(!u.creator_code) continue;
       // Stats depuis nr_users directement
       var lineage=await sbFetch('nr_users?applied_creator=eq.'+encodeURIComponent(u.creator_code)+'&select=email,ads_watched,races');
@@ -9191,6 +9341,1643 @@ updateMenu=function(){
   }
 };
 
+
+// ═══════════════════════════════════════════════════════════
+// MINI-GAMES NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function goMorpion(){G('pg-morpion');syncMiniCoins();}
+function goGomoku(){G('pg-gomoku');syncMiniCoins();}
+function goTetris(){G('pg-tetris');tetStart();syncMiniCoins();}
+function goDamier(){G('pg-damier');syncMiniCoins();}
+function syncMiniCoins(){
+  var c=U?U.coins||0:0;
+  var els=['mo-coins','tet-coins','da-coins'];
+  els.forEach(function(id){var e=document.getElementById(id);if(e)e.textContent=c;});
+}
+
+// ═══════════════════════════════════════════════════════════
+// MORPION (TIC-TAC-TOE)
+// ═══════════════════════════════════════════════════════════
+var MO={board:Array(9).fill(null),current:'X',mode:'2p',scores:{X:0,O:0},active:false};
+
+function startMorpion(mode){
+  MO.mode=mode;
+  MO.board=Array(9).fill(null);
+  MO.current='X';
+  MO.active=true;
+  document.getElementById('mo-setup').style.display='none';
+  document.getElementById('mo-game').style.display='block';
+  renderMoBoard();
+  updateMoStatus();
+  if(mode==='ai'&&MO.current==='O') setTimeout(moAiMove,600);
+}
+
+function renderMoBoard(){
+  var board=document.getElementById('mo-board');
+  if(!board)return;
+  board.innerHTML='';
+  MO.board.forEach(function(cell,i){
+    var btn=document.createElement('button');
+    btn.style.cssText='width:100%;aspect-ratio:1;font-size:2rem;font-weight:900;border-radius:12px;cursor:pointer;transition:all .15s;' +
+      'background:'+(cell?'rgba(255,255,255,.08)':'rgba(255,255,255,.04)')+';' +
+      'border:2px solid '+(cell?'rgba(255,255,255,.2)':'rgba(255,255,255,.1)')+';' +
+      'color:'+(cell==='X'?'#FF5252':cell==='O'?'#64B5F6':'transparent')+';';
+    btn.textContent=cell||'·';
+    btn.onclick=(function(idx){
+      return function(){
+        if(MO.mode==='online') moPlayOnline(idx);
+        else moPlay(idx);
+      };
+    })(i);
+    board.appendChild(btn);
+  });
+}
+
+function updateMoStatus(){
+  var el=document.getElementById('mo-status');
+  if(!el)return;
+  var player=MO.current==='X'?'❌':'⭕';
+  if(MO.mode==='ai'){
+    el.textContent=MO.current==='X'?t('damier_your_turn'):t('damier_ai_thinking');
+  } else {
+    el.textContent=player+' '+t('damier_your_turn');
+  }
+}
+
+function moPlay(i){
+  if(!MO.active||MO.board[i]) return;
+  if(MO.mode==='ai'&&MO.current==='O') return;
+  MO.board[i]=MO.current;
+  renderMoBoard();
+  var result=checkMoWin();
+  if(result){moEndGame(result);return;}
+  MO.current=MO.current==='X'?'O':'X';
+  updateMoStatus();
+  if(MO.mode==='ai'&&MO.current==='O') setTimeout(moAiMove,500);
+}
+
+function moAiMove(){
+  if(!MO.active) return;
+  // Try to win, then block, then center, then random
+  var best=moBestMove();
+  if(best===-1) return;
+  MO.board[best]='O';
+  renderMoBoard();
+  var result=checkMoWin();
+  if(result){moEndGame(result);return;}
+  MO.current='X';
+  updateMoStatus();
+}
+
+function moBestMove(){
+  // Win
+  for(var i=0;i<9;i++){if(!MO.board[i]){MO.board[i]='O';if(checkMoWinner(MO.board)==='O'){MO.board[i]=null;return i;}MO.board[i]=null;}}
+  // Block
+  for(var i=0;i<9;i++){if(!MO.board[i]){MO.board[i]='X';if(checkMoWinner(MO.board)==='X'){MO.board[i]=null;return i;}MO.board[i]=null;}}
+  // Center
+  if(!MO.board[4])return 4;
+  // Corners
+  var corners=[0,2,6,8].filter(function(i){return !MO.board[i];});
+  if(corners.length)return corners[Math.floor(Math.random()*corners.length)];
+  // Any
+  var free=MO.board.map(function(v,i){return v?-1:i;}).filter(function(i){return i>=0;});
+  return free.length?free[Math.floor(Math.random()*free.length)]:-1;
+}
+
+var MO_LINES=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+function checkMoWinner(b){
+  for(var _li=0;_li<MO_LINES.length;_li++){var l=MO_LINES[_li];if(b[l[0]]&&b[l[0]]===b[l[1]]&&b[l[0]]===b[l[2]])return b[l[0]];}
+  return null;
+}
+function checkMoWin(){
+  var w=checkMoWinner(MO.board);
+  if(w)return w;
+  if(MO.board.every(function(c){return c;}))return 'draw';
+  return null;
+}
+function moEndGame(result){
+  MO.active=false;
+  var won=(result!=='draw')&&(result===MO.current||(MO.mode==='ai'&&result==='X'));
+  var isDraw=result==='draw';
+  var coins=0;
+  if(won){coins=10;MO.scores[result]=(MO.scores[result]||0)+1;}
+  else if(isDraw){coins=2;MO.scores.X++;MO.scores.O++;}
+  document.getElementById('mo-score-x').textContent=MO.scores.X||0;
+  document.getElementById('mo-score-o').textContent=MO.scores.O||0;
+  if(coins>0&&U){addCoins(coins);syncMiniCoins();}
+  var el=document.getElementById('mo-result');
+  el.style.display='flex';
+  document.getElementById('mo-result-icon').textContent=isDraw?'🤝':won?'🏆':'❌';
+  document.getElementById('mo-result-text').textContent=isDraw?t('morpion_draw'):won?t('morpion_win'):t('morpion_lost');
+  document.getElementById('mo-result-coins').textContent=coins>0?'+'+coins+' 🪙':'';
+}
+function resetMorpion(){
+  document.getElementById('mo-result').style.display='none';
+  startMorpion(MO.mode);
+}
+function closeMoResult(){
+  document.getElementById('mo-result').style.display='none';
+  document.getElementById('mo-setup').style.display='block';
+  document.getElementById('mo-game').style.display='none';
+}
+
+// ═══════════════════════════════════════════════════════════
+// TETRIS
+// ═══════════════════════════════════════════════════════════
+var TET={ctx:null,board:null,piece:null,next:null,score:0,lines:0,level:1,
+  running:false,paused:false,loop:null,dropInterval:800,lastDrop:0};
+
+var TET_PIECES=[
+  {shape:[[1,1,1,1]],color:'#00E5FF'},           // I
+  {shape:[[1,1],[1,1]],color:'#FFD700'},           // O
+  {shape:[[0,1,0],[1,1,1]],color:'#CE93D8'},       // T
+  {shape:[[1,0],[1,1],[0,1]],color:'#00E676'},     // S
+  {shape:[[0,1],[1,1],[1,0]],color:'#FF5252'},     // Z
+  {shape:[[1,0],[1,0],[1,1]],color:'#FF6E40'},     // L
+  {shape:[[0,1],[0,1],[1,1]],color:'#64B5F6'},     // J
+];
+
+function tetInit(){
+  var canvas=document.getElementById('tet-canvas');
+  if(!canvas)return;
+  TET.ctx=canvas.getContext('2d');
+  TET.board=Array.from({length:20},function(){return Array(10).fill(0);});
+  // Touch controls
+  var tx=null;
+  canvas.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;},{ passive:true });
+  canvas.addEventListener('touchend',function(e){
+    if(tx===null)return;
+    var dx=e.changedTouches[0].clientX-tx;
+    var dy=e.changedTouches[0].clientY-(e.changedTouches[0].clientY);
+    if(Math.abs(dx)>30){tetMove(dx>0?1:-1);}
+    else{tetRotate();}
+    tx=null;
+  },{ passive:true });
+}
+
+function tetNewPiece(){
+  var p=TET.next||TET_PIECES[Math.floor(Math.random()*TET_PIECES.length)];
+  TET.next=TET_PIECES[Math.floor(Math.random()*TET_PIECES.length)];
+  return{shape:p.shape.map(function(r){return r.slice();}),color:p.color,x:3,y:0};
+}
+
+function tetStart(){
+  tetInit();
+  TET.board=Array.from({length:20},function(){return Array(10).fill(0);});
+  TET.score=0;TET.lines=0;TET.level=1;TET.dropInterval=800;
+  TET.next=null;
+  TET.piece=tetNewPiece();
+  TET.running=true;TET.paused=false;
+  document.getElementById('tet-over').style.display='none';
+  document.getElementById('tet-score').textContent='0';
+  document.getElementById('tet-lines').textContent='0';
+  document.getElementById('tet-level').textContent='1';
+  var best=parseInt(localStorage.getItem('nr_tetris_best')||'0');
+  document.getElementById('tet-best').textContent=best;
+  if(TET.loop)clearInterval(TET.loop);
+  TET.loop=setInterval(tetTick,50);
+  tetDraw();
+}
+
+function tetTick(){
+  if(!TET.running||TET.paused)return;
+  TET.lastDrop=(TET.lastDrop||0)+50;
+  if(TET.lastDrop>=TET.dropInterval){
+    TET.lastDrop=0;
+    if(!tetMoveDown())tetLock();
+  }
+  tetDraw();
+}
+
+function tetMoveDown(){
+  TET.piece.y++;
+  if(tetCollide()){TET.piece.y--;return false;}
+  return true;
+}
+
+function tetCollide(){
+  var p=TET.piece;
+  for(var r=0;r<p.shape.length;r++){
+    for(var c=0;c<p.shape[r].length;c++){
+      if(!p.shape[r][c])continue;
+      var ny=p.y+r,nx=p.x+c;
+      if(ny>=20||nx<0||nx>=10||TET.board[ny][nx])return true;
+    }
+  }
+  return false;
+}
+
+function tetLock(){
+  var p=TET.piece;
+  for(var r=0;r<p.shape.length;r++){
+    for(var c=0;c<p.shape[r].length;c++){
+      if(!p.shape[r][c])continue;
+      if(p.y+r<0){tetGameOver();return;}
+      TET.board[p.y+r][p.x+c]=p.color;
+    }
+  }
+  tetClearLines();
+  TET.piece=tetNewPiece();
+  if(tetCollide())tetGameOver();
+}
+
+function tetClearLines(){
+  var cleared=0;
+  TET.board=TET.board.filter(function(row){
+    if(row.every(Boolean)){cleared++;return false;}
+    return true;
+  });
+  while(TET.board.length<20)TET.board.unshift(Array(10).fill(0));
+  if(cleared){
+    var pts=[0,100,300,500,800][cleared]*TET.level;
+    TET.score+=pts;TET.lines+=cleared;
+    TET.level=Math.floor(TET.lines/10)+1;
+    TET.dropInterval=Math.max(100,800-TET.level*70);
+    document.getElementById('tet-score').textContent=TET.score;
+    document.getElementById('tet-lines').textContent=TET.lines;
+    document.getElementById('tet-level').textContent=TET.level;
+  }
+}
+
+function tetDraw(){
+  var ctx=TET.ctx;if(!ctx)return;
+  var W=200,H=400,CW=W/10,CH=H/20;
+  ctx.fillStyle='#050510';ctx.fillRect(0,0,W,H);
+  // Board
+  for(var r=0;r<20;r++){
+    for(var c=0;c<10;c++){
+      if(TET.board[r][c]){
+        ctx.fillStyle=TET.board[r][c];
+        ctx.fillRect(c*CW+1,r*CH+1,CW-2,CH-2);
+        ctx.fillStyle='rgba(255,255,255,.15)';
+        ctx.fillRect(c*CW+1,r*CH+1,CW-2,3);
+      }
+    }
+  }
+  // Grid
+  ctx.strokeStyle='rgba(255,255,255,.04)';ctx.lineWidth=.5;
+  for(var i=0;i<10;i++){ctx.beginPath();ctx.moveTo(i*CW,0);ctx.lineTo(i*CW,H);ctx.stroke();}
+  for(var i=0;i<20;i++){ctx.beginPath();ctx.moveTo(0,i*CH);ctx.lineTo(W,i*CH);ctx.stroke();}
+  // Ghost
+  if(TET.piece){
+    var ghost={shape:TET.piece.shape,color:'rgba(255,255,255,.12)',x:TET.piece.x,y:TET.piece.y};
+    while(true){ghost.y++;var tmp=TET.piece;TET.piece=ghost;if(tetCollide()){ghost.y--;TET.piece=tmp;break;}TET.piece=tmp;}
+    drawTetPiece(ghost,CW,CH);
+    drawTetPiece(TET.piece,CW,CH);
+  }
+}
+
+function drawTetPiece(p,CW,CH){
+  var ctx=TET.ctx;
+  for(var r=0;r<p.shape.length;r++){
+    for(var c=0;c<p.shape[r].length;c++){
+      if(!p.shape[r][c])continue;
+      ctx.fillStyle=p.color;
+      ctx.fillRect((p.x+c)*CW+1,(p.y+r)*CH+1,CW-2,CH-2);
+      if(p.color!=='rgba(255,255,255,.12)'){
+        ctx.fillStyle='rgba(255,255,255,.2)';
+        ctx.fillRect((p.x+c)*CW+1,(p.y+r)*CH+1,CW-2,3);
+      }
+    }
+  }
+}
+
+function tetMove(dir){
+  if(!TET.running||TET.paused)return;
+  TET.piece.x+=dir;
+  if(tetCollide())TET.piece.x-=dir;
+  tetDraw();
+}
+
+function tetRotate(){
+  if(!TET.running||TET.paused)return;
+  var orig=TET.piece.shape;
+  TET.piece.shape=TET.piece.shape[0].map(function(_,i){return TET.piece.shape.map(function(r){return r[i];}).reverse();});
+  if(tetCollide())TET.piece.shape=orig;
+  tetDraw();
+}
+
+function tetDrop(){
+  if(!TET.running||TET.paused)return;
+  while(tetMoveDown()){}
+  tetLock();tetDraw();
+}
+
+function tetPauseToggle(){
+  TET.paused=!TET.paused;
+  document.querySelector('[data-tr="tetris_pause"]').textContent=TET.paused?'▶ Play':'⏸';
+}
+function tetPause(){TET.paused=true;if(TET.loop){clearInterval(TET.loop);TET.loop=null;}}
+
+function tetGameOver(){
+  TET.running=false;
+  if(TET.loop){clearInterval(TET.loop);TET.loop=null;}
+  var best=parseInt(localStorage.getItem('nr_tetris_best')||'0');
+  if(TET.score>best){localStorage.setItem('nr_tetris_best',TET.score);document.getElementById('tet-best').textContent=TET.score;}
+  var coins=Math.floor(TET.score/100);
+  if(coins>0&&U){addCoins(coins);syncMiniCoins();}
+  var over=document.getElementById('tet-over');
+  over.style.display='flex';
+  document.getElementById('tet-final-score').textContent='Score: '+TET.score+' | Niv. '+TET.level;
+  document.getElementById('tet-final-coins').textContent=coins>0?'+'+coins+' 🪙 gagnés':'';
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// DAMIER — VRAIES RÈGLES COMPLÈTES
+// 12 pions par joueur, captures en rafale, déplacement diagonal long (dames)
+// ═══════════════════════════════════════════════════════════
+var DA={
+  board:null, ctx:null, mode:'2p', turn:1,
+  selected:null, validMoves:[], mustCapture:false,
+  scores:{1:0,2:0}, active:false,
+  CELL:40, SIZE:8
+};
+
+// Pièces: 0=vide, 1=j1 pion, 2=j2 pion, 11=j1 dame, 22=j2 dame
+function daInitBoard(){
+  var b=[];
+  for(var r=0;r<8;r++){b.push([0,0,0,0,0,0,0,0]);}
+  // J2 (noir) en haut lignes 0,1,2
+  for(var r=0;r<3;r++){
+    for(var c=0;c<8;c++){
+      if((r+c)%2===1) b[r][c]=2;
+    }
+  }
+  // J1 (blanc) en bas lignes 5,6,7
+  for(var r=5;r<8;r++){
+    for(var c=0;c<8;c++){
+      if((r+c)%2===1) b[r][c]=1;
+    }
+  }
+  return b;
+}
+
+function daOwner(p){
+  if(p===1||p===11) return 1;
+  if(p===2||p===22) return 2;
+  return 0;
+}
+function daIsKing(p){ return p===11||p===22; }
+
+// Calcule TOUTES les captures possibles pour un joueur
+function daFindAllCaptures(board, player){
+  var caps=[];
+  for(var r=0;r<8;r++){
+    for(var c=0;c<8;c++){
+      if(daOwner(board[r][c])===player){
+        var moves=daGetMoves(board,r,c,true);
+        if(moves.length) caps=caps.concat(moves);
+      }
+    }
+  }
+  return caps;
+}
+
+// Calcule les mouvements valides pour une pièce
+// captureOnly=true: uniquement les captures
+function daGetMoves(board,r,c,captureOnly){
+  var p=board[r][c];
+  if(!p) return[];
+  var owner=daOwner(p);
+  var isKing=daIsKing(p);
+  var moves=[];
+
+  if(isKing){
+    // Dame: se déplace en diagonale longue dans les 4 directions
+    [[-1,-1],[-1,1],[1,-1],[1,1]].forEach(function(d){
+      var dr=d[0],dc=d[1];
+      var nr=r+dr,nc=c+dc;
+      var captured=null,capturedR=null,capturedC=null;
+      while(nr>=0&&nr<8&&nc>=0&&nc<8){
+        var target=board[nr][nc];
+        if(target===0){
+          if(!captureOnly||captured){
+            moves.push({fr:r,fc:c,tr:nr,tc:nc,cr:capturedR,cc:capturedC,cap:captured!==null});
+          }
+          if(captured) break; // Après capture on s'arrête au premier vide
+          nr+=dr; nc+=dc;
+        } else if(daOwner(target)!==owner&&!captured){
+          // Pion ennemi — on peut capturer
+          captured=target; capturedR=nr; capturedC=nc;
+          nr+=dr; nc+=dc;
+        } else { break; }
+      }
+    });
+  } else {
+    // Pion normal: avance vers l'avant, capture dans les 2 diagonales
+    var fwd= owner===1?-1:1; // j1 monte, j2 descend
+    // Mouvements normaux (1 case)
+    if(!captureOnly){
+      [fwd].forEach(function(dr){
+        [-1,1].forEach(function(dc){
+          var nr=r+dr,nc=c+dc;
+          if(nr>=0&&nr<8&&nc>=0&&nc<8&&board[nr][nc]===0){
+            moves.push({fr:r,fc:c,tr:nr,tc:nc,cr:null,cc:null,cap:false});
+          }
+        });
+      });
+    }
+    // Captures (toutes directions pour pion aussi)
+    [-1,1].forEach(function(dr){
+      [-1,1].forEach(function(dc){
+        var er=r+dr,ec=c+dc; // ennemi
+        var lr=r+dr*2,lc=c+dc*2; // atterrissage
+        if(er>=0&&er<8&&ec>=0&&ec<8&&lr>=0&&lr<8&&lc>=0&&lc<8){
+          if(daOwner(board[er][ec])!==0&&daOwner(board[er][ec])!==owner&&board[lr][lc]===0){
+            moves.push({fr:r,fc:c,tr:lr,tc:lc,cr:er,cc:ec,cap:true});
+          }
+        }
+      });
+    });
+  }
+  return moves;
+}
+
+function startDamier(mode){
+  DA.mode=mode;
+  DA.board=daInitBoard();
+  DA.turn=1; DA.selected=null; DA.validMoves=[]; DA.active=true;
+  DA.scores={1:0,2:0};
+  document.getElementById('da-setup').style.display='none';
+  document.getElementById('da-game').style.display='block';
+  document.getElementById('da-result').style.display='none';
+  var canvas=document.getElementById('da-canvas');
+  DA.ctx=canvas.getContext('2d');
+  canvas.ontouchstart=null; canvas.onclick=null;
+  canvas.addEventListener('touchstart',function(e){
+    e.preventDefault();
+    var rect=canvas.getBoundingClientRect();
+    var scaleX=canvas.width/rect.width;
+    var scaleY=canvas.height/rect.height;
+    var x=(e.touches[0].clientX-rect.left)*scaleX;
+    var y=(e.touches[0].clientY-rect.top)*scaleY;
+    daClick(Math.floor(x/DA.CELL),Math.floor(y/DA.CELL));
+  },{passive:false});
+  canvas.addEventListener('click',function(e){
+    var rect=canvas.getBoundingClientRect();
+    var scaleX=canvas.width/rect.width;
+    var scaleY=canvas.height/rect.height;
+    var x=(e.clientX-rect.left)*scaleX;
+    var y=(e.clientY-rect.top)*scaleY;
+    daClick(Math.floor(x/DA.CELL),Math.floor(y/DA.CELL));
+  });
+  daCheckMustCapture();
+  daDrawBoard();
+  updateDaStatus();
+}
+
+function daCheckMustCapture(){
+  var caps=daFindAllCaptures(DA.board,DA.turn);
+  DA.mustCapture=caps.length>0;
+}
+
+function daClick(c,r){
+  if(!DA.active)return;
+  if(DA.mode==='ai'&&DA.turn===2)return;
+  if(r<0||r>7||c<0||c>7)return;
+
+  var p=DA.board[r][c];
+  var owner=daOwner(p);
+
+  // Clic sur une pièce du joueur actuel
+  if(owner===DA.turn){
+    var moves=daGetMoves(DA.board,r,c,DA.mustCapture);
+    if(DA.mustCapture){
+      moves=moves.filter(function(m){return m.cap;});
+    }
+    if(moves.length>0||!DA.mustCapture){
+      DA.selected={r:r,c:c};
+      DA.validMoves=moves;
+      daDrawBoard();
+      return;
+    }
+  }
+
+  // Clic sur une case de destination
+  if(DA.selected){
+    var mv=DA.validMoves.find(function(m){return m.tr===r&&m.tc===c;});
+    if(mv){
+      daApplyMove(mv);
+      return;
+    }
+    // Désélectionner
+    DA.selected=null; DA.validMoves=[];
+    daDrawBoard();
+  }
+}
+
+function daApplyMove(mv){
+  var b=DA.board;
+  var p=b[mv.fr][mv.fc];
+  b[mv.tr][mv.tc]=p;
+  b[mv.fr][mv.fc]=0;
+
+  // Retirer la pièce capturée
+  if(mv.cap&&mv.cr!==null){
+    b[mv.cr][mv.cc]=0;
+  }
+
+  // Promotion en dame
+  if(p===1&&mv.tr===0){ b[mv.tr][mv.tc]=11; p=11; }
+  if(p===2&&mv.tr===7){ b[mv.tr][mv.tc]=22; p=22; }
+
+  DA.selected=null; DA.validMoves=[];
+
+  // Si capture — vérifier captures en rafale (même pièce)
+  if(mv.cap){
+    var chain=daGetMoves(b,mv.tr,mv.tc,true).filter(function(m){return m.cap;});
+    if(chain.length>0){
+      // Continuer avec la même pièce
+      DA.selected={r:mv.tr,c:mv.tc};
+      DA.validMoves=chain;
+      DA.mustCapture=true;
+      daDrawBoard();
+      updateDaStatus();
+      return;
+    }
+  }
+
+  // Vérifier fin de partie
+  var count1=0,count2=0;
+  for(var r=0;r<8;r++)for(var c=0;c<8;c++){
+    var o=daOwner(b[r][c]);
+    if(o===1)count1++;
+    if(o===2)count2++;
+  }
+  if(!count1||!count2){daEndGame(!count1?2:1);return;}
+
+  // Changer de tour
+  DA.turn=DA.turn===1?2:1;
+  daCheckMustCapture();
+
+  // Vérifier si le joueur suivant a des mouvements
+  var hasMoves=false;
+  for(var r=0;r<8&&!hasMoves;r++){
+    for(var c=0;c<8&&!hasMoves;c++){
+      if(daOwner(b[r][c])===DA.turn){
+        if(daGetMoves(b,r,c,false).length>0) hasMoves=true;
+      }
+    }
+  }
+  if(!hasMoves){daEndGame(DA.turn===1?2:1);return;}
+
+  daDrawBoard();
+  updateDaStatus();
+  if(DA.mode==='ai'&&DA.turn===2) setTimeout(daAiMove,500);
+}
+
+function daAiMove(){
+  if(!DA.active||DA.turn!==2)return;
+  // Trouver tous les mouvements valides
+  var allMoves=[];
+  daCheckMustCapture();
+  for(var r=0;r<8;r++){
+    for(var c=0;c<8;c++){
+      if(daOwner(DA.board[r][c])===2){
+        var moves=daGetMoves(DA.board,r,c,DA.mustCapture);
+        if(DA.mustCapture) moves=moves.filter(function(m){return m.cap;});
+        moves.forEach(function(m){allMoves.push(m);});
+      }
+    }
+  }
+  if(!allMoves.length)return;
+  // Préférer captures, puis promotions, puis aléatoire
+  var caps=allMoves.filter(function(m){return m.cap;});
+  var promos=allMoves.filter(function(m){return m.tr===7;});
+  var pool=caps.length?caps:(promos.length?promos:allMoves);
+  var mv=pool[Math.floor(Math.random()*pool.length)];
+  daApplyMove(mv);
+}
+
+function daDrawBoard(){
+  var ctx=DA.ctx; if(!ctx)return;
+  var S=DA.CELL, N=DA.SIZE;
+  var W=S*N, H=S*N;
+
+  // Cases
+  for(var r=0;r<N;r++){
+    for(var c=0;c<N;c++){
+      if((r+c)%2===0){
+        ctx.fillStyle='#F0D9B5';
+      } else {
+        ctx.fillStyle='#8B4513';
+      }
+      ctx.fillRect(c*S,r*S,S,S);
+    }
+  }
+
+  // Cases valides surlignées
+  DA.validMoves.forEach(function(m){
+    ctx.fillStyle='rgba(255,255,0,.45)';
+    ctx.fillRect(m.tc*S+1,m.tr*S+1,S-2,S-2);
+  });
+
+  // Case sélectionnée
+  if(DA.selected){
+    ctx.fillStyle='rgba(0,255,100,.4)';
+    ctx.fillRect(DA.selected.c*S+1,DA.selected.r*S+1,S-2,S-2);
+  }
+
+  // Pièces
+  for(var r=0;r<N;r++){
+    for(var c=0;c<N;c++){
+      var p=DA.board[r][c];
+      if(!p) continue;
+      var isP1=(p===1||p===11);
+      var isKing=(p===11||p===22);
+      var cx=c*S+S/2, cy=r*S+S/2, rad=S/2-5;
+
+      // Ombre
+      ctx.beginPath();
+      ctx.arc(cx+2,cy+2,rad,0,Math.PI*2);
+      ctx.fillStyle='rgba(0,0,0,.3)';
+      ctx.fill();
+
+      // Corps principal
+      ctx.beginPath();
+      ctx.arc(cx,cy,rad,0,Math.PI*2);
+      var grad=ctx.createRadialGradient(cx-rad*0.3,cy-rad*0.3,rad*0.1,cx,cy,rad);
+      if(isP1){
+        grad.addColorStop(0,'#FFFFFF');
+        grad.addColorStop(0.5,'#E0E0E0');
+        grad.addColorStop(1,'#AAAAAA');
+      } else {
+        grad.addColorStop(0,'#555555');
+        grad.addColorStop(0.5,'#2C2C2C');
+        grad.addColorStop(1,'#111111');
+      }
+      ctx.fillStyle=grad;
+      ctx.fill();
+
+      // Bordure
+      ctx.strokeStyle=isP1?'rgba(0,0,0,.25)':'rgba(255,255,255,.2)';
+      ctx.lineWidth=1.5; ctx.stroke();
+
+      // Couronne pour dame
+      if(isKing){
+        ctx.fillStyle='#FFD700';
+        ctx.font='bold '+(S*0.45)+'px serif';
+        ctx.textAlign='center';
+        ctx.textBaseline='middle';
+        ctx.fillText('♛',cx,cy+1);
+      }
+    }
+  }
+
+  // Scores
+  document.getElementById('da-score-b').textContent=DA.scores[1]||0;
+  document.getElementById('da-score-w').textContent=DA.scores[2]||0;
+}
+
+function updateDaStatus(){
+  var el=document.getElementById('da-status'); if(!el)return;
+  if(!DA.active){return;}
+  var prefix=DA.mustCapture?'⚡ ':'';
+  if(DA.mode==='ai'){
+    el.textContent=DA.turn===1?(prefix+t('damier_your_turn')):t('damier_ai_thinking');
+  } else {
+    el.textContent=prefix+(DA.turn===1?t('damier_p1_turn'):t('damier_p2_turn'));
+  }
+}
+
+function daEndGame(winner){
+  DA.active=false;
+  DA.scores[winner]=(DA.scores[winner]||0)+1;
+  var iWon=(DA.mode==='ai'?winner===1:(winner===1));
+  var coins=iWon?15:0;
+  if(coins>0&&U){addCoins(coins);syncMiniCoins();}
+  var el=document.getElementById('da-result');
+  el.style.display='flex';
+  document.getElementById('da-result-icon').textContent=iWon?'🏆':'❌';
+  var txt=DA.mode==='2p'?(winner===1?'⚪ '+t('damier_win'):'⚫ '+t('damier_win')):
+          (iWon?t('damier_win'):t('damier_lost'));
+  document.getElementById('da-result-text').textContent=txt;
+  document.getElementById('da-result-coins').textContent=coins>0?'+'+coins+' 🪙':'';
+  daDrawBoard();
+}
+
+function resetDamier(){
+  document.getElementById('da-result').style.display='none';
+  startDamier(DA.mode);
+}
+function closeDaResult(){
+  document.getElementById('da-result').style.display='none';
+  document.getElementById('da-setup').style.display='block';
+  document.getElementById('da-game').style.display='none';
+}
+
+// ═══════════════════════════════════════════════════════════
+// MINI-GAMES ONLINE SYSTEM
+// Uses nr_rooms table + Supabase Realtime broadcast
+// ═══════════════════════════════════════════════════════════
+var MG_ONLINE = {
+  game: null,        // 'morpion' | 'damier'
+  role: null,        // 'host' | 'guest'
+  roomCode: null,
+  myName: null,
+  oppName: null,
+  channel: null,
+  pollId: null,
+  active: false,
+  cost: 15
+};
+
+// ── NAVIGATION ──
+function mgCreateRoom(game){
+  if(!U){toast(t('toast_please_login'));G('pg-login');return;}
+  // Accept master code OR coins (like NationRush online)
+  if(!isAdmin()&&(U.coins||0)<MG_ONLINE.cost){toast(t('toast_not_enough_coins'));return;}
+  MG_ONLINE.game=game;
+  MG_ONLINE.role='host';
+  MG_ONLINE.roomCode=generateRoomCode();
+  MG_ONLINE.myName=U.name||U.email;
+  MG_ONLINE.oppName=null;
+  MG_ONLINE.active=false;
+  G('pg-mg-online');
+  syncMiniCoins();
+  document.getElementById('mg-online-title').textContent=game==='morpion'?t('morpion_title'):game==='gomoku'?t('gomoku_title'):t('damier_title');
+  document.getElementById('mg-host-view').style.display='block';
+  document.getElementById('mg-guest-view').style.display='none';
+  document.getElementById('mg-room-code-display').textContent=MG_ONLINE.roomCode;
+  document.getElementById('mg-guest-joined').style.display='none';
+  document.getElementById('mg-start-btn').style.display='none';
+  document.getElementById('mg-ol-coins').textContent=U.coins||0;
+  mgSaveRoom();
+  mgStartHostPoll();
+}
+
+function mgJoinRoom(game){
+  if(!U){toast(t('toast_please_login'));G('pg-login');return;}
+  if(!isAdmin()&&(U.coins||0)<MG_ONLINE.cost){toast(t('toast_not_enough_coins'));return;}
+  MG_ONLINE.game=game;
+  MG_ONLINE.role='guest';
+  MG_ONLINE.myName=U.name||U.email;
+  G('pg-mg-online');
+  syncMiniCoins();
+  document.getElementById('mg-online-title').textContent=game==='morpion'?t('morpion_title'):t('damier_title');
+  document.getElementById('mg-host-view').style.display='none';
+  document.getElementById('mg-guest-view').style.display='block';
+  document.getElementById('mg-join-input').value='';
+  document.getElementById('mg-join-status').textContent='';
+  document.getElementById('mg-waiting-start').style.display='none';
+  document.getElementById('mg-ol-coins').textContent=U.coins||0;
+}
+
+async function mgSaveRoom(){
+  try{
+    await sbFetch('nr_rooms?on_conflict=code',{
+      method:'POST',prefer:'resolution=merge-duplicates,return=minimal',
+      body:{
+        code:MG_ONLINE.roomCode, type:'mg_'+MG_ONLINE.game,
+        host_email:U.email, host_name:MG_ONLINE.myName,
+        guest_email:null, guest_name:null,
+        status:'waiting', host_taps:0, guest_taps:0,
+        host_country:null, guest_country:null,
+        created_at:new Date().toISOString(), updated_at:new Date().toISOString()
+      }
+    });
+  }catch(e){}
+}
+
+function mgCopyCode(){
+  try{navigator.clipboard.writeText(MG_ONLINE.roomCode);}catch(e){}
+  toast('📋 '+MG_ONLINE.roomCode);
+}
+
+// ── HOST POLLING — watch for guest joining ──
+function mgStartHostPoll(){
+  if(MG_ONLINE.pollId) clearInterval(MG_ONLINE.pollId);
+  MG_ONLINE.pollId=setInterval(async function(){
+    try{
+      var rows=await sbFetch('nr_rooms?code=eq.'+MG_ONLINE.roomCode+'&select=guest_email,guest_name,status&limit=1');
+      if(!rows||!rows[0]) return;
+      var r=rows[0];
+      if(r.guest_email&&!MG_ONLINE.oppName){
+        MG_ONLINE.oppName=r.guest_name||r.guest_email;
+        document.getElementById('mg-guest-name').textContent=MG_ONLINE.oppName;
+        document.getElementById('mg-guest-joined').style.display='block';
+        document.getElementById('mg-start-btn').style.display='block';
+        clearInterval(MG_ONLINE.pollId); MG_ONLINE.pollId=null;
+      }
+      if(r.status==='playing'){
+        clearInterval(MG_ONLINE.pollId); MG_ONLINE.pollId=null;
+      }
+    }catch(e){}
+  },2000);
+}
+
+// ── GUEST JOIN ──
+async function mgConfirmJoin(){
+  var code=document.getElementById('mg-join-input').value.trim().toUpperCase();
+  if(code.length!==6){toast('Code invalide');return;}
+  document.getElementById('mg-join-status').textContent='🔍 Recherche...';
+  try{
+    var rows=await sbFetch('nr_rooms?code=eq.'+code+'&select=code,type,host_email,host_name,status,guest_email&limit=1');
+    if(!rows||!rows[0]){document.getElementById('mg-join-status').textContent='❌ Room introuvable';return;}
+    var r=rows[0];
+    if(r.status!=='waiting'){document.getElementById('mg-join-status').textContent='❌ Room déjà en cours';return;}
+    if(r.guest_email){document.getElementById('mg-join-status').textContent='❌ Room déjà complète';return;}
+    // Detect game type from room
+    if(r.type&&r.type.startsWith('mg_')) MG_ONLINE.game=r.type.replace('mg_','');
+    MG_ONLINE.roomCode=code;
+    MG_ONLINE.oppName=r.host_name||r.host_email;
+    // Join the room
+    await sbFetch('nr_rooms?code=eq.'+code,{
+      method:'PATCH',prefer:'return=minimal',
+      body:{guest_email:U.email,guest_name:MG_ONLINE.myName,updated_at:new Date().toISOString()}
+    });
+    document.getElementById('mg-join-status').textContent='✅ Rejoint ! En attente du lancement...';
+    document.getElementById('mg-waiting-start').style.display='block';
+    // Deduct coins
+    if(U&&!isAdmin()){U.coins=(U.coins||0)-MG_ONLINE.cost;saveU();syncMiniCoins();}
+    mgStartGuestPoll();
+  }catch(e){document.getElementById('mg-join-status').textContent='❌ Erreur de connexion';}
+}
+
+// ── GUEST POLLING — wait for host to start ──
+function mgStartGuestPoll(){
+  if(MG_ONLINE.pollId) clearInterval(MG_ONLINE.pollId);
+  MG_ONLINE.pollId=setInterval(async function(){
+    try{
+      var rows=await sbFetch('nr_rooms?code=eq.'+MG_ONLINE.roomCode+'&select=status&limit=1');
+      if(!rows||!rows[0]) return;
+      if(rows[0].status==='playing'){
+        clearInterval(MG_ONLINE.pollId); MG_ONLINE.pollId=null;
+        mgLaunchGame();
+      }
+    }catch(e){}
+  },1500);
+}
+
+// ── HOST STARTS GAME ──
+async function mgStartGame(){
+  if(!MG_ONLINE.oppName){toast('Attendez qu\'un joueur rejoigne !');return;}
+  // Deduct coins from host
+  if(U&&!isAdmin()){U.coins=(U.coins||0)-MG_ONLINE.cost;saveU();syncMiniCoins();}
+  // Update room status
+  try{
+    await sbFetch('nr_rooms?code=eq.'+MG_ONLINE.roomCode,{
+      method:'PATCH',prefer:'return=minimal',
+      body:{status:'playing',updated_at:new Date().toISOString()}
+    });
+  }catch(e){}
+  mgLaunchGame();
+}
+
+// ── LAUNCH THE ACTUAL GAME ──
+function mgLaunchGame(){
+  MG_ONLINE.active=true;
+  mgInitChannel();
+  if(MG_ONLINE.game==='morpion'){
+    mgLaunchMorpion();
+  } else if(MG_ONLINE.game==='gomoku'){
+    mgLaunchGomoku();
+  } else if(MG_ONLINE.game==='damier'){
+    mgLaunchDamier();
+  }
+}
+
+// ── LEAVE ROOM ──
+async function mgLeaveRoom(){
+  if(MG_ONLINE.pollId){clearInterval(MG_ONLINE.pollId);MG_ONLINE.pollId=null;}
+  mgCloseChannel();
+  try{
+    if(MG_ONLINE.role==='host'&&MG_ONLINE.roomCode){
+      await sbFetch('nr_rooms?code=eq.'+MG_ONLINE.roomCode,{method:'DELETE',prefer:'return=minimal'});
+    }
+  }catch(e){}
+  MG_ONLINE.roomCode=null; MG_ONLINE.active=false;
+  // Go back to game setup
+  if(MG_ONLINE.game==='morpion') G('pg-morpion');
+  else if(MG_ONLINE.game==='damier') G('pg-damier');
+  else G('pg-menu');
+}
+
+// ═══ REALTIME CHANNEL ═══
+function mgInitChannel(){
+  mgCloseChannel();
+  try{
+    var client=_getSupabaseClient();
+    if(!client) return;
+    MG_ONLINE.channel=client.channel('mg-room-'+MG_ONLINE.roomCode,{
+      config:{broadcast:{self:false,ack:false}}
+    });
+    MG_ONLINE.channel.on('broadcast',{event:'mg_move'},function(payload){
+      mgHandleOpponentMove(payload.payload);
+    });
+    MG_ONLINE.channel.on('broadcast',{event:'mg_end'},function(payload){
+      // Opponent signals game end
+    });
+    MG_ONLINE.channel.subscribe();
+  }catch(e){}
+}
+
+function mgCloseChannel(){
+  if(MG_ONLINE.channel){
+    try{MG_ONLINE.channel.unsubscribe();}catch(e){}
+    MG_ONLINE.channel=null;
+  }
+}
+
+function mgSendMove(moveData){
+  if(!MG_ONLINE.channel) return;
+  try{
+    MG_ONLINE.channel.send({type:'broadcast',event:'mg_move',payload:moveData});
+  }catch(e){}
+}
+
+// ═══ MORPION ONLINE ═══
+function mgLaunchMorpion(){
+  // Host=X goes first, Guest=O
+  MO.board=Array(9).fill(null);
+  MO.scores={X:0,O:0};
+  MO.mode='online';
+  MO.mySymbol=MG_ONLINE.role==='host'?'X':'O';
+  MO.current='X'; // X always goes first
+  MO.active=true;
+  document.getElementById('mo-setup').style.display='none';
+  document.getElementById('mo-game').style.display='block';
+  document.getElementById('mo-result').style.display='none';
+  G('pg-morpion');
+  renderMoBoard();
+  updateMoStatusOnline();
+}
+
+function updateMoStatusOnline(){
+  var el=document.getElementById('mo-status'); if(!el) return;
+  var myTurn=(MO.current===MO.mySymbol);
+  el.textContent=myTurn?('✋ '+t('damier_your_turn')):(MG_ONLINE.oppName+' ...');
+  el.style.color=myTurn?'#FFD700':'#8899AA';
+}
+
+// Override moPlay for online mode
+var _origMoPlay=null;
+function moPlayOnline(i){
+  if(!MO.active) return;
+  if(MO.mode!=='online'){moPlay(i);return;}
+  // Only play if it's my turn
+  if(MO.current!==MO.mySymbol) return;
+  if(MO.board[i]) return;
+  MO.board[i]=MO.current;
+  // Send to opponent
+  mgSendMove({type:'morpion',cell:i,symbol:MO.current});
+  renderMoBoard();
+  var result=checkMoWin();
+  if(result){mgMorpionEnd(result);return;}
+  MO.current=MO.current==='X'?'O':'X';
+  updateMoStatusOnline();
+}
+
+function mgHandleOpponentMove(data){
+  if(!MO.active||MG_ONLINE.game!=='morpion') return;
+  if(data.type==='morpion'){
+    MO.board[data.cell]=data.symbol;
+    renderMoBoard();
+    var result=checkMoWin();
+    if(result){mgMorpionEnd(result);return;}
+    MO.current=MO.current==='X'?'O':'X';
+    updateMoStatusOnline();
+  }
+  if(data.type==='gomoku'){
+    if(!GO.active) return;
+    GO.board[data.r][data.c]=data.player;
+    var goWinCells=goCheckWin(data.r,data.c,data.player);
+    if(goWinCells){
+      GO.winCells=goWinCells;
+      goDrawBoard();
+      var _goWin2=data.player;
+      setTimeout(function(){goEndGame(_goWin2);},1500);
+      return;
+    }
+    goDrawBoard();
+    GO.turn=GO.turn===1?2:1;
+    updateGoStatus();
+  }
+  if(data.type==='damier'){
+    mgApplyOpponentDamierMove(data.move);
+  }
+}
+
+
+// ═══ GOMOKU ONLINE ═══
+function mgLaunchGomoku(){
+  // Host=player1(noir), Guest=player2(blanc)
+  GO.myPlayer = MG_ONLINE.role==='host' ? 1 : 2;
+  startGomoku('online');
+  G('pg-gomoku');
+}
+
+function goPlaceOnline(r, c){
+  if(!GO.active) return;
+  if(GO.turn !== GO.myPlayer) return;
+  if(GO.board[r][c] !== 0) return;
+  // Send to opponent
+  mgSendMove({type:'gomoku', r:r, c:c, player:GO.turn});
+  goPlace(r, c);
+}
+
+function mgMorpionEnd(result){
+  MO.active=false;
+  var iWon=(result!=='draw')&&(result===MO.mySymbol);
+  var isDraw=(result==='draw');
+  var coins=iWon?10:isDraw?2:0; // Gagnant +10, nul +2, perdant 0 (a déjà perdu 15)
+  if(coins>0&&U){addCoins(coins);syncMiniCoins();}
+  mgCloseChannel();
+  // Delete room
+  if(MG_ONLINE.roomCode) sbFetch('nr_rooms?code=eq.'+MG_ONLINE.roomCode,{method:'DELETE',prefer:'return=minimal'}).catch(function(){});
+  var el=document.getElementById('mo-result');
+  el.style.display='flex';
+  document.getElementById('mo-result-icon').textContent=isDraw?'🤝':iWon?'🏆':'❌';
+  document.getElementById('mo-result-text').textContent=isDraw?t('mg_online_draw'):iWon?t('mg_online_win'):t('mg_online_lost');
+  document.getElementById('mo-result-coins').textContent=iWon?('+10 🪙'):isDraw?('+2 🪙'):('-15 🪙');
+}
+
+// renderMoBoard handles both local and online mode via MO.mode check
+
+// ═══ DAMIER ONLINE ═══
+function mgLaunchDamier(){
+  // Host=player1(white/bottom), Guest=player2(black/top)
+  DA.board=daInitBoard();
+  DA.mode='online';
+  DA.myPlayer=MG_ONLINE.role==='host'?1:2;
+  DA.turn=1; DA.selected=null; DA.validMoves=[]; DA.active=true;
+  DA.scores={1:0,2:0};
+  document.getElementById('da-setup').style.display='none';
+  document.getElementById('da-game').style.display='block';
+  document.getElementById('da-result').style.display='none';
+  G('pg-damier');
+  var canvas=document.getElementById('da-canvas');
+  DA.ctx=canvas.getContext('2d');
+  // Set online click handler flag
+  canvas.ontouchstart=function(e){
+    e.preventDefault();
+    var rect=canvas.getBoundingClientRect();
+    var sx=canvas.width/rect.width, sy=canvas.height/rect.height;
+    var x=(e.touches[0].clientX-rect.left)*sx;
+    var y=(e.touches[0].clientY-rect.top)*sy;
+    daClickOnline(Math.floor(x/DA.CELL),Math.floor(y/DA.CELL));
+  };
+  canvas.onclick=function(e){
+    var rect=canvas.getBoundingClientRect();
+    var sx=canvas.width/rect.width, sy=canvas.height/rect.height;
+    var x=(e.clientX-rect.left)*sx;
+    var y=(e.clientY-rect.top)*sy;
+    daClickOnline(Math.floor(x/DA.CELL),Math.floor(y/DA.CELL));
+  };
+  daCheckMustCapture();
+  daDrawBoard();
+  updateDaStatusOnline();
+}
+
+function updateDaStatusOnline(){
+  var el=document.getElementById('da-status'); if(!el) return;
+  var myTurn=(DA.turn===DA.myPlayer);
+  var prefix=DA.mustCapture&&myTurn?'⚡ ':'';
+  el.textContent=myTurn?(prefix+t('damier_your_turn')):(MG_ONLINE.oppName+' ...');
+  el.style.color=myTurn?'#81C784':'#8899AA';
+}
+
+function daClickOnline(c,r){
+  if(!DA.active) return;
+  if(DA.turn!==DA.myPlayer) return; // Not my turn
+  // Use same click logic as local
+  var p=DA.board[r][c];
+  var owner=daOwner(p);
+  if(owner===DA.turn){
+    var moves=daGetMoves(DA.board,r,c,DA.mustCapture);
+    if(DA.mustCapture) moves=moves.filter(function(m){return m.cap;});
+    DA.selected={r:r,c:c};
+    DA.validMoves=moves;
+    daDrawBoard();
+    return;
+  }
+  if(DA.selected){
+    var mv=DA.validMoves.find(function(m){return m.tr===r&&m.tc===c;});
+    if(mv){
+      // Send move to opponent
+      mgSendMove({type:'damier',move:{fr:DA.selected.r,fc:DA.selected.c,tr:mv.tr,tc:mv.tc,cr:mv.cr,cc:mv.cc,cap:mv.cap}});
+      daApplyMoveOnline(mv,true);
+      return;
+    }
+  }
+  DA.selected=null; DA.validMoves=[];
+  daDrawBoard();
+}
+
+function mgApplyOpponentDamierMove(mv){
+  if(!DA.active) return;
+  daApplyMoveOnline(mv,false);
+}
+
+function daApplyMoveOnline(mv,isMe){
+  var b=DA.board;
+  var p=b[mv.fr][mv.fc];
+  b[mv.tr][mv.tc]=p;
+  b[mv.fr][mv.fc]=0;
+  if(mv.cap&&mv.cr!==null) b[mv.cr][mv.cc]=0;
+  // Promotion
+  if(p===1&&mv.tr===0) b[mv.tr][mv.tc]=11;
+  if(p===2&&mv.tr===7) b[mv.tr][mv.tc]=22;
+  p=b[mv.tr][mv.tc];
+  DA.selected=null; DA.validMoves=[];
+  // Check chain capture
+  if(mv.cap){
+    var chain=daGetMoves(b,mv.tr,mv.tc,true).filter(function(m){return m.cap;});
+    if(chain.length>0&&isMe){
+      DA.selected={r:mv.tr,c:mv.tc};
+      DA.validMoves=chain;
+      DA.mustCapture=true;
+      daDrawBoard();
+      updateDaStatusOnline();
+      return;
+    }
+  }
+  // Check win
+  var c1=0,c2=0;
+  for(var r=0;r<8;r++) for(var c=0;c<8;c++){var o=daOwner(b[r][c]);if(o===1)c1++;if(o===2)c2++;}
+  if(!c1||!c2){mgDamierEnd(!c1?2:1);return;}
+  // Switch turn
+  DA.turn=DA.turn===1?2:1;
+  daCheckMustCapture();
+  // Check if next player has moves
+  var hasMoves=false;
+  for(var r=0;r<8&&!hasMoves;r++) for(var c=0;c<8&&!hasMoves;c++) if(daOwner(b[r][c])===DA.turn&&daGetMoves(b,r,c,false).length>0) hasMoves=true;
+  if(!hasMoves){mgDamierEnd(DA.turn===1?2:1);return;}
+  daDrawBoard();
+  updateDaStatusOnline();
+}
+
+function mgDamierEnd(winner){
+  DA.active=false;
+  var iWon=(winner===DA.myPlayer);
+  var coins=iWon?10:0; // Gagnant +10, perdant 0 (a déjà perdu 15)
+  if(coins>0&&U){addCoins(coins);syncMiniCoins();}
+  mgCloseChannel();
+  if(MG_ONLINE.roomCode) sbFetch('nr_rooms?code=eq.'+MG_ONLINE.roomCode,{method:'DELETE',prefer:'return=minimal'}).catch(function(){});
+  var el=document.getElementById('da-result');
+  el.style.display='flex';
+  document.getElementById('da-result-icon').textContent=iWon?'🏆':'❌';
+  document.getElementById('da-result-text').textContent=iWon?t('mg_online_win'):t('mg_online_lost');
+  document.getElementById('da-result-coins').textContent=iWon?'+10 🪙':'-15 🪙';
+  daDrawBoard();
+}
+
+// ═══════════════════════════════════════════════════════════
+// GOMOKU — 5 en ligne sur grille 15×15
+// Points noirs/blancs aux intersections
+// ═══════════════════════════════════════════════════════════
+var GO = {
+  board: null, ctx: null, mode: '2p',
+  turn: 1, // 1=noir, 2=blanc
+  scores: {1:0, 2:0}, active: false,
+  SIZE: 15, CELL: 0,  // 15x15 intersections
+  myPlayer: null,  // pour online
+  winCells: null   // cells to highlight on win
+};
+
+function goGomoku(){ G('pg-gomoku'); syncMiniCoins(); }
+
+function startGomoku(mode){
+  GO.mode = mode;
+  GO.board = [];
+  for(var r=0;r<GO.SIZE;r++){
+    GO.board.push([]);
+    for(var c=0;c<GO.SIZE;c++) GO.board[r].push(0);
+  }
+  GO.turn = 1; GO.active = true; GO.winCells = null;
+  document.getElementById('go-setup').style.display = 'none';
+  document.getElementById('go-game').style.display = 'block';
+  document.getElementById('go-result').style.display = 'none';
+
+  // Setup canvas — fit screen width
+  var canvas = document.getElementById('go-canvas');
+  var maxW = Math.min(window.innerWidth - 40, 360);
+  GO.CELL = Math.floor(maxW / GO.SIZE);
+  var sz = GO.CELL * (GO.SIZE - 1) + GO.CELL * 2;
+  canvas.width = sz; canvas.height = sz;
+  GO.ctx = canvas.getContext('2d');
+
+  canvas.ontouchstart = function(e){
+    e.preventDefault();
+    var rect = canvas.getBoundingClientRect();
+    var sx = canvas.width / rect.width;
+    var x = (e.touches[0].clientX - rect.left) * sx;
+    var y = (e.touches[0].clientY - rect.top) * sx;
+    goClick(x, y);
+  };
+  canvas.onclick = function(e){
+    var rect = canvas.getBoundingClientRect();
+    var sx = canvas.width / rect.width;
+    goClick((e.clientX - rect.left) * sx, (e.clientY - rect.top) * sx);
+  };
+
+  goDrawBoard();
+  updateGoStatus();
+  if(mode === 'ai' && GO.turn === 2) setTimeout(goAiMove, 400);
+}
+
+function goClick(px, py){
+  if(!GO.active) return;
+  if(GO.mode === 'ai' && GO.turn === 2) return;
+  if(GO.mode === 'online' && GO.turn !== GO.myPlayer) return;
+  // Convert pixel to grid intersection
+  var c = Math.round((px - GO.CELL) / GO.CELL);
+  var r = Math.round((py - GO.CELL) / GO.CELL);
+  if(r < 0 || r >= GO.SIZE || c < 0 || c >= GO.SIZE) return;
+  if(GO.board[r][c] !== 0) return;
+  goPlace(r, c);
+}
+
+function goPlace(r, c){
+  GO.board[r][c] = GO.turn;
+  // Send online move if it's our turn
+  if(GO.mode==='online' && GO.turn===GO.myPlayer){
+    mgSendMove({type:'gomoku',r:r,c:c,player:GO.turn});
+  }
+  goDrawBoard();
+  var winCells = goCheckWin(r, c, GO.turn);
+  if(winCells){
+    GO.winCells = winCells;
+    goDrawBoard(); // redraw with winning line BEFORE modal
+    // Wait 1.5s so player sees the winning line, then show modal
+    var _goWinner = GO.turn;
+    setTimeout(function(){ goEndGame(_goWinner); }, 1500);
+    return;
+  }
+  // Check draw (board full)
+  var full = GO.board.every(function(row){ return row.every(function(v){ return v !== 0; }); });
+  if(full){ goEndGame(0); return; }
+  GO.turn = GO.turn === 1 ? 2 : 1;
+  updateGoStatus();
+  if(GO.mode === 'ai' && GO.turn === 2) setTimeout(goAiMove, 400);
+}
+
+function goCheckWin(r, c, player){
+  var dirs = [[0,1],[1,0],[1,1],[1,-1]];
+  for(var d = 0; d < dirs.length; d++){
+    var dr = dirs[d][0], dc = dirs[d][1];
+    var cells = [{r:r,c:c}];
+    // Forward
+    for(var i = 1; i < 9; i++){
+      var nr = r+dr*i, nc = c+dc*i;
+      if(nr<0||nr>=GO.SIZE||nc<0||nc>=GO.SIZE||GO.board[nr][nc]!==player) break;
+      cells.push({r:nr,c:nc});
+    }
+    // Backward
+    for(var i = 1; i < 9; i++){
+      var nr = r-dr*i, nc = c-dc*i;
+      if(nr<0||nr>=GO.SIZE||nc<0||nc>=GO.SIZE||GO.board[nr][nc]!==player) break;
+      cells.unshift({r:nr,c:nc});
+    }
+    if(cells.length >= 5){
+      // Return the winning cells (first 5+ consecutive)
+      return cells;
+    }
+  }
+  return false;
+}
+
+function goAiMove(){
+  if(!GO.active) return;
+  // Smart AI: score each empty intersection
+  var bestScore = -1, bestR = -1, bestC = -1;
+  for(var r = 0; r < GO.SIZE; r++){
+    for(var c = 0; c < GO.SIZE; c++){
+      if(GO.board[r][c] !== 0) continue;
+      var score = goScoreMove(r, c, 2) * 2 + goScoreMove(r, c, 1);
+      // Prefer center
+      var centerBonus = (GO.SIZE/2 - Math.abs(r - GO.SIZE/2) + GO.SIZE/2 - Math.abs(c - GO.SIZE/2)) * 0.1;
+      score += centerBonus;
+      if(score > bestScore){ bestScore = score; bestR = r; bestC = c; }
+    }
+  }
+  if(bestR >= 0) goPlace(bestR, bestC);
+}
+
+function goScoreMove(r, c, player){
+  GO.board[r][c] = player;
+  var score = 0;
+  var dirs = [[0,1],[1,0],[1,1],[1,-1]];
+  for(var d = 0; d < dirs.length; d++){
+    var dr = dirs[d][0], dc = dirs[d][1];
+    var count = 1;
+    for(var i=1;i<5;i++){var nr=r+dr*i,nc=c+dc*i;if(nr<0||nr>=GO.SIZE||nc<0||nc>=GO.SIZE||GO.board[nr][nc]!==player)break;count++;}
+    for(var i=1;i<5;i++){var nr=r-dr*i,nc=c-dc*i;if(nr<0||nr>=GO.SIZE||nc<0||nc>=GO.SIZE||GO.board[nr][nc]!==player)break;count++;}
+    if(count>=5) score+=10000;
+    else if(count===4) score+=1000;
+    else if(count===3) score+=100;
+    else if(count===2) score+=10;
+    else score+=1;
+  }
+  GO.board[r][c] = 0;
+  return score;
+}
+
+function goDrawBoard(){
+  var ctx = GO.ctx; if(!ctx) return;
+  var S = GO.CELL, N = GO.SIZE;
+  var W = canvas_go_size(), H = W;
+
+  // Background — bois
+  ctx.fillStyle = '#DEB887';
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(0,0,0,.5)';
+  ctx.lineWidth = 1;
+  for(var i = 0; i < N; i++){
+    // Horizontal
+    ctx.beginPath();
+    ctx.moveTo(S, S + i*S);
+    ctx.lineTo(S + (N-1)*S, S + i*S);
+    ctx.stroke();
+    // Vertical
+    ctx.beginPath();
+    ctx.moveTo(S + i*S, S);
+    ctx.lineTo(S + i*S, S + (N-1)*S);
+    ctx.stroke();
+  }
+
+  // Star points (hoshi) for 15x15
+  var stars = [3,7,11];
+  for(var i=0;i<stars.length;i++){
+    for(var j=0;j<stars.length;j++){
+      ctx.beginPath();
+      ctx.arc(S + stars[i]*S, S + stars[j]*S, 3, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(0,0,0,.6)';
+      ctx.fill();
+    }
+  }
+
+  // Pieces
+  for(var r=0;r<N;r++){
+    for(var c=0;c<N;c++){
+      if(GO.board[r][c] === 0) continue;
+      var cx = S + c*S, cy = S + r*S, rad = S*0.45;
+      var isBlack = GO.board[r][c] === 1;
+      // Check if this cell is a winning cell
+      var isWinCell = GO.winCells && GO.winCells.some(function(w){return w.r===r&&w.c===c;});
+      // Shadow
+      ctx.beginPath();
+      ctx.arc(cx+1, cy+2, rad, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(0,0,0,.25)';
+      ctx.fill();
+      // Piece
+      ctx.beginPath();
+      ctx.arc(cx, cy, rad, 0, Math.PI*2);
+      var grad = ctx.createRadialGradient(cx - rad*0.3, cy - rad*0.35, rad*0.05, cx, cy, rad);
+      if(isBlack){
+        grad.addColorStop(0, '#555');
+        grad.addColorStop(0.4, '#1a1a1a');
+        grad.addColorStop(1, '#000');
+      } else {
+        grad.addColorStop(0, '#fff');
+        grad.addColorStop(0.5, '#eee');
+        grad.addColorStop(1, '#ccc');
+      }
+      ctx.fillStyle = grad;
+      ctx.fill();
+      // Winning highlight — golden ring
+      if(isWinCell){
+        ctx.beginPath();
+        ctx.arc(cx, cy, rad+2, 0, Math.PI*2);
+        ctx.strokeStyle = '#FFD700';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+      }
+    }
+  }
+  // Draw winning line through the 5 cells
+  if(GO.winCells && GO.winCells.length >= 5){
+    var first = GO.winCells[0], last = GO.winCells[GO.winCells.length-1];
+    var x1 = S + first.c*S, y1 = S + first.r*S;
+    var x2 = S + last.c*S,  y2 = S + last.r*S;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = 'rgba(255,50,50,.85)';
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+  }
+}
+
+function canvas_go_size(){
+  var canvas = document.getElementById('go-canvas');
+  return canvas ? canvas.width : 0;
+}
+
+function updateGoStatus(){
+  var el = document.getElementById('go-status'); if(!el) return;
+  var isP1 = GO.turn === 1;
+  if(GO.mode === 'ai'){
+    el.textContent = isP1 ? t('damier_your_turn') : t('gomoku_ai_thinking');
+  } else {
+    el.textContent = isP1 ? t('gomoku_p1_turn') : t('gomoku_p2_turn');
+  }
+}
+
+function goEndGame(winner){
+  GO.active = false;
+  if(winner > 0) GO.scores[winner] = (GO.scores[winner]||0) + 1;
+  document.getElementById('go-score-b').textContent = GO.scores[1]||0;
+  document.getElementById('go-score-w').textContent = GO.scores[2]||0;
+  var iWon = (winner > 0) && (GO.mode === 'ai' ? winner === 1 : GO.mode === 'online' ? winner === GO.myPlayer : true);
+  var isDraw = winner === 0;
+  var coins = iWon ? 10 : isDraw ? 2 : 0;
+  if(coins > 0 && U){ addCoins(coins); syncMiniCoins(); }
+  var el = document.getElementById('go-result');
+  el.style.display = 'flex';
+  document.getElementById('go-result-icon').textContent = isDraw ? '🤝' : iWon ? '🏆' : '❌';
+  // Show winner name
+  var winnerName = '';
+  if(!isDraw){
+    if(GO.mode==='online'){
+      winnerName = iWon ? (U?U.name:'Vous') : (MG_ONLINE.oppName||'Adversaire');
+    } else if(GO.mode==='ai'){
+      winnerName = iWon ? (U?U.name:'Joueur 1') : '🤖 IA';
+    } else {
+      winnerName = winner===1 ? '⚫ Joueur 1' : '⚪ Joueur 2';
+    }
+  }
+  var resultMsg = isDraw ? t('gomoku_draw') : (winnerName + ' — ' + (iWon ? t('gomoku_win') : t('gomoku_lost')));
+  document.getElementById('go-result-text').textContent = resultMsg;
+  document.getElementById('go-result-coins').textContent = coins > 0 ? '+'+coins+' 🪙' : (isDraw ? '' : (iWon ? '' : '-15 🪙'));
+}
+
+function resetGomoku(){
+  document.getElementById('go-result').style.display = 'none';
+  startGomoku(GO.mode);
+}
+
+function closeGoResult(){
+  document.getElementById('go-result').style.display = 'none';
+  document.getElementById('go-setup').style.display = 'block';
+  document.getElementById('go-game').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════════════
+// DIFFICULTY SYSTEM — Facile / Normal / Difficile
+// ═══════════════════════════════════════════════════════════
+var DIFF = { mo:'easy', go:'easy', da:'easy', tet:'easy' };
+
+// ── Helper: update button styles ──
+function diffSetBtn(prefix, level){
+  var levels=['easy','normal','hard'];
+  var colors={mo:'255,215,0', go:'206,147,216', da:'129,199,132', tet:'255,110,64'};
+  var col = colors[prefix] || '255,215,0';
+  levels.forEach(function(lv){
+    var btn = document.getElementById(prefix+'-diff-'+lv);
+    if(!btn) return;
+    if(lv===level){
+      btn.style.border = '2px solid rgba('+col+',.7)';
+      btn.style.background = 'rgba('+col+',.2)';
+      btn.style.color = 'rgb('+col+')';
+    } else {
+      btn.style.border = '2px solid rgba(255,255,255,.15)';
+      btn.style.background = 'transparent';
+      btn.style.color = '#8899AA';
+    }
+  });
+  DIFF[prefix] = level;
+}
+
+function setMoDiff(lv){ diffSetBtn('mo',lv); }
+function setGoDiff(lv){ diffSetBtn('go',lv); }
+function setDaDiff(lv){ diffSetBtn('da',lv); }
+function setTetDiff(lv){
+  diffSetBtn('tet',lv);
+  // Restart tetris with new difficulty
+  var speeds = {easy:1200, normal:800, hard:300};
+  TET.dropInterval = speeds[lv] || 800;
+  if(TET.running) TET.dropInterval = speeds[lv] || 800;
+  if(!TET.running) tetStart();
+}
+
+// ── TITATO AI with difficulty ──
+// Override moBestMove to use difficulty
+var _origMoBestMove = moBestMove;
+moBestMove = function(){
+  var diff = DIFF.mo || 'easy';
+  if(diff === 'easy'){
+    // Random move
+    var free = MO.board.map(function(v,i){return v?-1:i;}).filter(function(i){return i>=0;});
+    return free.length ? free[Math.floor(Math.random()*free.length)] : -1;
+  } else if(diff === 'normal'){
+    // Win or block, then random
+    for(var i=0;i<9;i++){if(!MO.board[i]){MO.board[i]='O';if(checkMoWinner(MO.board)==='O'){MO.board[i]=null;return i;}MO.board[i]=null;}}
+    for(var i=0;i<9;i++){if(!MO.board[i]){MO.board[i]='X';if(checkMoWinner(MO.board)==='X'){MO.board[i]=null;return i;}MO.board[i]=null;}}
+    var free2=MO.board.map(function(v,i){return v?-1:i;}).filter(function(i){return i>=0;});
+    return free2.length?free2[Math.floor(Math.random()*free2.length)]:-1;
+  } else {
+    // Hard — original perfect logic
+    return _origMoBestMove();
+  }
+};
+
+// ── GOMOKU AI with difficulty ──
+var _origGoAiMove = goAiMove;
+goAiMove = function(){
+  if(!GO.active) return;
+  var diff = DIFF.go || 'easy';
+  if(diff === 'easy'){
+    // Random empty cell near existing pieces (not too smart)
+    var cells = [];
+    for(var r=0;r<GO.SIZE;r++) for(var c=0;c<GO.SIZE;c++) if(GO.board[r][c]===0) cells.push({r:r,c:c});
+    if(!cells.length) return;
+    // Pick randomly among cells near existing pieces
+    var near = cells.filter(function(p){
+      for(var dr=-2;dr<=2;dr++) for(var dc=-2;dc<=2;dc++){
+        var nr=p.r+dr,nc=p.c+dc;
+        if(nr>=0&&nr<GO.SIZE&&nc>=0&&nc<GO.SIZE&&GO.board[nr][nc]!==0) return true;
+      }
+      return false;
+    });
+    var pool = near.length ? near : cells;
+    var pick = pool[Math.floor(Math.random()*pool.length)];
+    goPlace(pick.r, pick.c);
+  } else if(diff === 'normal'){
+    // Medium — only look 2 ahead
+    var best=-1,bestR=-1,bestC=-1;
+    for(var r=0;r<GO.SIZE;r++) for(var c=0;c<GO.SIZE;c++){
+      if(GO.board[r][c]!==0) continue;
+      // Only consider cells near existing pieces
+      var hasNeighbor=false;
+      for(var dr=-2;dr<=2&&!hasNeighbor;dr++) for(var dc=-2;dc<=2&&!hasNeighbor;dc++){
+        var nr=r+dr,nc=c+dc;
+        if(nr>=0&&nr<GO.SIZE&&nc>=0&&nc<GO.SIZE&&GO.board[nr][nc]!==0) hasNeighbor=true;
+      }
+      if(!hasNeighbor) continue;
+      var score=goScoreMove(r,c,2)+goScoreMove(r,c,1)*0.8;
+      if(score>best){best=score;bestR=r;bestC=c;}
+    }
+    if(bestR>=0) goPlace(bestR,bestC);
+    else _origGoAiMove();
+  } else {
+    // Hard — full analysis
+    _origGoAiMove();
+  }
+};
+
+// ── DAMIER AI with difficulty ──
+var _origDaAiMove = daAiMove;
+daAiMove = function(){
+  if(!DA.active||DA.turn!==2) return;
+  var diff = DIFF.da || 'easy';
+  daCheckMustCapture();
+  var allMoves=[];
+  for(var r=0;r<8;r++) for(var c=0;c<8;c++){
+    if(daOwner(DA.board[r][c])===2){
+      var moves=daGetMoves(DA.board,r,c,DA.mustCapture);
+      if(DA.mustCapture) moves=moves.filter(function(m){return m.cap;});
+      moves.forEach(function(m){allMoves.push(m);});
+    }
+  }
+  if(!allMoves.length) return;
+
+  if(diff === 'easy'){
+    // Random move (no preference for captures)
+    var mv = allMoves[Math.floor(Math.random()*allMoves.length)];
+    daApplyMove(mv);
+  } else if(diff === 'normal'){
+    // Prefer captures and promotions
+    var caps=allMoves.filter(function(m){return m.cap;});
+    var promos=allMoves.filter(function(m){return m.tr===7;});
+    var pool=caps.length?caps:(promos.length?promos:allMoves);
+    var mv=pool[Math.floor(Math.random()*pool.length)];
+    daApplyMove(mv);
+  } else {
+    // Hard — minimax-like: score each move
+    var bestScore=-Infinity, bestMv=null;
+    allMoves.forEach(function(mv){
+      var score=0;
+      if(mv.cap) score+=50;
+      if(mv.tr===7) score+=40; // promotion
+      // Count total pieces after move (simulate)
+      var b=DA.board;
+      var myPieces=0,oppPieces=0;
+      for(var r=0;r<8;r++) for(var c=0;c<8;c++){
+        if(daOwner(b[r][c])===2) myPieces++;
+        if(daOwner(b[r][c])===1) oppPieces++;
+      }
+      score += myPieces*2 - oppPieces*3;
+      // Prefer center control
+      score += (4-Math.abs(mv.tc-3.5))*0.5;
+      if(score>bestScore){bestScore=score;bestMv=mv;}
+    });
+    if(bestMv) daApplyMove(bestMv);
+  }
+};
+
+// ── TETRIS difficulty applied at start ──
+var _origTetStart = tetStart;
+tetStart = function(){
+  _origTetStart();
+  var diff = DIFF.tet || 'easy';
+  var speeds = {easy:1200, normal:800, hard:300};
+  TET.dropInterval = speeds[diff] || 800;
+};
 </script>
 <!-- Modal master code pour affilies -->
 <div id="aff-mc-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);
@@ -9217,6 +11004,296 @@ updateMenu=function(){
       data-tr="creator_cancel">
       Annuler
     </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- MORPION (Tic-Tac-Toe) PAGE -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="pg" id="pg-morpion" style="background:#0a0a1a">
+  <div class="menu-header">
+    <button class="back-btn" onclick="G('pg-menu')" style="background:none;border:none;color:#FFD700;font-size:1.4rem;cursor:pointer;padding:4px 8px">‹</button>
+    <div class="logo" style="font-size:1.2rem" data-tr="morpion_title">Morpion</div>
+    <div class="chud" style="font-size:.85rem;padding:4px 10px">🪙 <span id="mo-coins">0</span></div>
+  </div>
+  <div style="padding:16px;max-width:400px;margin:0 auto">
+    <!-- Mode selector -->
+    <div id="mo-setup" style="text-align:center">
+      <div style="color:#8899AA;font-size:.8rem;letter-spacing:2px;margin-bottom:14px" data-tr="morpion_choose_mode">CHOISIR LE MODE</div>
+      <button class="tbtn" style="width:100%;margin-bottom:10px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.3);color:#FFD700;padding:14px;border-radius:12px;font-size:1rem;cursor:pointer" onclick="startMorpion('2p')">👥 <span data-tr="morpion_2p">2 Joueurs</span></button>
+      <!-- Vs IA + difficulty -->
+      <div style="background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.2);border-radius:14px;padding:12px;margin-bottom:10px">
+        <div style="color:#00E676;font-size:.85rem;font-weight:700;margin-bottom:8px">🤖 <span data-tr="morpion_vs_ai">Vs IA</span></div>
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <button onclick="setMoDiff('easy')" id="mo-diff-easy" style="flex:1;padding:7px 4px;border-radius:8px;border:2px solid rgba(0,230,118,.5);background:rgba(0,230,118,.2);color:#00E676;font-size:.75rem;font-weight:700;cursor:pointer" data-tr="diff_easy">😊 Facile</button>
+          <button onclick="setMoDiff('normal')" id="mo-diff-normal" style="flex:1;padding:7px 4px;border-radius:8px;border:2px solid rgba(255,255,255,.15);background:transparent;color:#8899AA;font-size:.75rem;font-weight:700;cursor:pointer" data-tr="diff_normal">😐 Normal</button>
+          <button onclick="setMoDiff('hard')" id="mo-diff-hard" style="flex:1;padding:7px 4px;border-radius:8px;border:2px solid rgba(255,255,255,.15);background:transparent;color:#8899AA;font-size:.75rem;font-weight:700;cursor:pointer" data-tr="diff_hard">😈 Difficile</button>
+        </div>
+        <button onclick="startMorpion('ai')" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(0,230,118,.4);background:rgba(0,230,118,.1);color:#00E676;font-size:.9rem;cursor:pointer" data-tr="diff_start_ai">▶ Jouer vs IA</button>
+      </div>
+      <div style="font-size:.75rem;letter-spacing:2px;color:#8899AA;margin:10px 0 6px;text-align:left" data-tr="menu_online_section">🌐 ONLINE</div>
+      <button class="tbtn" style="width:100%;margin-bottom:6px;background:rgba(0,150,255,.1);border:1px solid rgba(0,150,255,.3);color:#64B5F6;padding:14px;border-radius:12px;font-size:1rem;cursor:pointer" onclick="mgCreateRoom('morpion')">🌐 <span data-tr="mg_create_room">Créer une room</span> <span style="font-size:.75rem;color:#8899AA">15🪙</span></button>
+      <button class="tbtn" style="width:100%;margin-bottom:10px;background:rgba(0,100,255,.07);border:1px solid rgba(0,100,255,.2);color:#90CAF9;padding:12px;border-radius:12px;font-size:.95rem;cursor:pointer" onclick="mgJoinRoom('morpion')">🔗 <span data-tr="mg_join_room">Rejoindre avec code</span></button>
+    </div>
+    <!-- Game board -->
+    <div id="mo-game" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div id="mo-status" style="color:#FFD700;font-size:.9rem;font-weight:700"></div>
+        <div style="display:flex;gap:8px">
+          <div style="background:rgba(255,255,255,.08);padding:4px 10px;border-radius:8px;font-size:.8rem;color:#fff">❌ <span id="mo-score-x">0</span></div>
+          <div style="background:rgba(255,255,255,.08);padding:4px 10px;border-radius:8px;font-size:.8rem;color:#fff">⭕ <span id="mo-score-o">0</span></div>
+        </div>
+      </div>
+      <!-- 3x3 grid -->
+      <div id="mo-board" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:280px;margin:0 auto 16px">
+      </div>
+      <div style="display:flex;gap:8px;justify-content:center">
+        <button class="tbtn" onclick="resetMorpion()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;padding:8px 20px;border-radius:10px;cursor:pointer;font-size:.85rem" data-tr="morpion_restart">↩ Rejouer</button>
+        <button class="tbtn" onclick="G('pg-morpion');document.getElementById('mo-setup').style.display='block';document.getElementById('mo-game').style.display='none'" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#8899AA;padding:8px 20px;border-radius:10px;cursor:pointer;font-size:.85rem" data-tr="morpion_menu">Menu</button>
+      </div>
+    </div>
+    <!-- Result modal -->
+    <div id="mo-result" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;display:none;align-items:center;justify-content:center;flex-direction:column">
+      <div style="background:#1a1a2e;border:2px solid rgba(255,215,0,.3);border-radius:20px;padding:30px;text-align:center;max-width:280px">
+        <div id="mo-result-icon" style="font-size:3rem;margin-bottom:10px">🏆</div>
+        <div id="mo-result-text" style="font-size:1.2rem;font-weight:900;color:#FFD700;margin-bottom:8px"></div>
+        <div id="mo-result-coins" style="color:#00E676;font-size:.9rem;margin-bottom:20px"></div>
+        <div style="display:flex;gap:10px;justify-content:center">
+          <button class="tbtn" onclick="resetMorpion()" style="background:rgba(255,215,0,.15);border:1px solid rgba(255,215,0,.4);color:#FFD700;padding:10px 20px;border-radius:12px;cursor:pointer;font-weight:700" data-tr="morpion_restart">↩ Rejouer</button>
+          <button class="tbtn" onclick="closeMoResult()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;padding:10px 20px;border-radius:12px;cursor:pointer" data-tr="morpion_menu">Menu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- TETRIS PAGE -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="pg" id="pg-tetris" style="background:#0a0a1a">
+  <div class="menu-header">
+    <button class="back-btn" onclick="G('pg-menu');tetrisPause()" style="background:none;border:none;color:#FF6E40;font-size:1.4rem;cursor:pointer;padding:4px 8px">‹</button>
+    <div class="logo" style="font-size:1.2rem;color:#FF6E40" data-tr="tetris_title">Tetris</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <div style="font-size:.75rem;color:#8899AA">Niv <span id="tet-level">1</span></div>
+      <div class="chud" style="font-size:.85rem;padding:4px 10px">🪙 <span id="tet-coins">0</span></div>
+    </div>
+  </div>
+  <div style="padding:10px;display:flex;flex-direction:column;align-items:center">
+    <!-- Difficulty selector for Tetris -->
+    <div id="tet-diff-bar" style="display:flex;gap:6px;margin-bottom:8px;width:100%;max-width:320px">
+      <button onclick="setTetDiff('easy')" id="tet-diff-easy" style="flex:1;padding:6px 4px;border-radius:8px;border:2px solid rgba(255,110,64,.5);background:rgba(255,110,64,.2);color:#FF6E40;font-size:.72rem;font-weight:700;cursor:pointer" data-tr="diff_easy">😊 Facile</button>
+      <button onclick="setTetDiff('normal')" id="tet-diff-normal" style="flex:1;padding:6px 4px;border-radius:8px;border:2px solid rgba(255,255,255,.15);background:transparent;color:#8899AA;font-size:.72rem;font-weight:700;cursor:pointer" data-tr="diff_normal">😐 Normal</button>
+      <button onclick="setTetDiff('hard')" id="tet-diff-hard" style="flex:1;padding:6px 4px;border-radius:8px;border:2px solid rgba(255,255,255,.15);background:transparent;color:#8899AA;font-size:.72rem;font-weight:700;cursor:pointer" data-tr="diff_hard">😈 Difficile</button>
+    </div>
+    <!-- Stats bar -->
+    <div style="display:flex;gap:12px;margin-bottom:10px;width:100%;max-width:320px;justify-content:space-between">
+      <div style="text-align:center">
+        <div style="font-size:.65rem;color:#8899AA" data-tr="tetris_score">SCORE</div>
+        <div id="tet-score" style="font-size:1.1rem;font-weight:900;color:#FF6E40">0</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:.65rem;color:#8899AA" data-tr="tetris_lines">LIGNES</div>
+        <div id="tet-lines" style="font-size:1.1rem;font-weight:900;color:#FFD700">0</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:.65rem;color:#8899AA" data-tr="tetris_best">RECORD</div>
+        <div id="tet-best" style="font-size:1.1rem;font-weight:900;color:#00E676">0</div>
+      </div>
+    </div>
+    <!-- Canvas -->
+    <canvas id="tet-canvas" width="200" height="400" style="border:2px solid rgba(255,110,64,.3);border-radius:8px;display:block;background:#050510"></canvas>
+    <!-- Controls -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;max-width:200px;width:100%">
+      <button onclick="tetMove(-1)" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;padding:14px;border-radius:10px;font-size:1.3rem;cursor:pointer">◀</button>
+      <button onclick="tetRotate()" style="background:rgba(255,110,64,.15);border:1px solid rgba(255,110,64,.4);color:#FF6E40;padding:14px;border-radius:10px;font-size:1.3rem;cursor:pointer">↻</button>
+      <button onclick="tetMove(1)" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;padding:14px;border-radius:10px;font-size:1.3rem;cursor:pointer">▶</button>
+      <button onclick="tetPauseToggle()" style="background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.3);color:#FFD700;padding:10px;border-radius:10px;font-size:.8rem;cursor:pointer;grid-column:1" data-tr="tetris_pause">⏸</button>
+      <button onclick="tetDrop()" style="background:rgba(0,230,118,.15);border:1px solid rgba(0,230,118,.4);color:#00E676;padding:10px;border-radius:10px;font-size:1.1rem;cursor:pointer">▼▼</button>
+    </div>
+    <!-- Swipe hint -->
+    <div style="color:#445;font-size:.7rem;margin-top:8px;text-align:center" data-tr="tetris_swipe_hint">← → glisser • ↑ tourner • ↓ descendre</div>
+    <!-- Game over modal -->
+    <div id="tet-over" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;align-items:center;justify-content:center;flex-direction:column">
+      <div style="background:#1a1a2e;border:2px solid rgba(255,110,64,.4);border-radius:20px;padding:30px;text-align:center;max-width:280px">
+        <div style="font-size:2.5rem;margin-bottom:8px">💀</div>
+        <div style="font-size:1.2rem;font-weight:900;color:#FF6E40;margin-bottom:6px" data-tr="tetris_gameover">GAME OVER</div>
+        <div id="tet-final-score" style="color:#FFD700;font-size:1rem;margin-bottom:4px"></div>
+        <div id="tet-final-coins" style="color:#00E676;font-size:.85rem;margin-bottom:20px"></div>
+        <div style="display:flex;gap:10px;justify-content:center">
+          <button onclick="tetStart()" style="background:rgba(255,110,64,.15);border:1px solid rgba(255,110,64,.4);color:#FF6E40;padding:10px 20px;border-radius:12px;cursor:pointer;font-weight:700" data-tr="tetris_restart">↩ Rejouer</button>
+          <button onclick="document.getElementById('tet-over').style.display='none';G('pg-menu')" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;padding:10px 20px;border-radius:12px;cursor:pointer" data-tr="morpion_menu">Menu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- DAMIER (Checkers) PAGE -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="pg" id="pg-damier" style="background:#0a0a1a">
+  <div class="menu-header">
+    <button class="back-btn" onclick="G('pg-menu')" style="background:none;border:none;color:#81C784;font-size:1.4rem;cursor:pointer;padding:4px 8px">‹</button>
+    <div class="logo" style="font-size:1.2rem;color:#81C784" data-tr="damier_title">Damier</div>
+    <div class="chud" style="font-size:.85rem;padding:4px 10px">🪙 <span id="da-coins">0</span></div>
+  </div>
+  <div style="padding:12px;max-width:400px;margin:0 auto">
+    <!-- Mode selector -->
+    <div id="da-setup" style="text-align:center">
+      <div style="color:#8899AA;font-size:.8rem;letter-spacing:2px;margin-bottom:14px" data-tr="damier_choose_mode">CHOISIR LE MODE</div>
+      <button class="tbtn" style="width:100%;margin-bottom:10px;background:rgba(129,199,132,.1);border:1px solid rgba(129,199,132,.3);color:#81C784;padding:14px;border-radius:12px;font-size:1rem;cursor:pointer" onclick="startDamier('2p')">👥 <span data-tr="morpion_2p">2 Joueurs</span></button>
+      <!-- Vs IA + difficulty -->
+      <div style="background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.2);border-radius:14px;padding:12px;margin-bottom:10px">
+        <div style="color:#00E676;font-size:.85rem;font-weight:700;margin-bottom:8px">🤖 <span data-tr="morpion_vs_ai">Vs IA</span></div>
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <button onclick="setDaDiff('easy')" id="da-diff-easy" style="flex:1;padding:7px 4px;border-radius:8px;border:2px solid rgba(0,230,118,.5);background:rgba(0,230,118,.2);color:#00E676;font-size:.75rem;font-weight:700;cursor:pointer" data-tr="diff_easy">😊 Facile</button>
+          <button onclick="setDaDiff('normal')" id="da-diff-normal" style="flex:1;padding:7px 4px;border-radius:8px;border:2px solid rgba(255,255,255,.15);background:transparent;color:#8899AA;font-size:.75rem;font-weight:700;cursor:pointer" data-tr="diff_normal">😐 Normal</button>
+          <button onclick="setDaDiff('hard')" id="da-diff-hard" style="flex:1;padding:7px 4px;border-radius:8px;border:2px solid rgba(255,255,255,.15);background:transparent;color:#8899AA;font-size:.75rem;font-weight:700;cursor:pointer" data-tr="diff_hard">😈 Difficile</button>
+        </div>
+        <button onclick="startDamier('ai')" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(0,230,118,.4);background:rgba(0,230,118,.1);color:#00E676;font-size:.9rem;cursor:pointer" data-tr="diff_start_ai">▶ Jouer vs IA</button>
+      </div>
+      <div style="font-size:.75rem;letter-spacing:2px;color:#8899AA;margin:10px 0 6px;text-align:left" data-tr="menu_online_section">🌐 ONLINE</div>
+      <button class="tbtn" style="width:100%;margin-bottom:6px;background:rgba(0,150,255,.1);border:1px solid rgba(0,150,255,.3);color:#64B5F6;padding:14px;border-radius:12px;font-size:1rem;cursor:pointer" onclick="mgCreateRoom('damier')">🌐 <span data-tr="mg_create_room">Créer une room</span> <span style="font-size:.75rem;color:#8899AA">15🪙</span></button>
+      <button class="tbtn" style="width:100%;margin-bottom:10px;background:rgba(0,100,255,.07);border:1px solid rgba(0,100,255,.2);color:#90CAF9;padding:12px;border-radius:12px;font-size:.95rem;cursor:pointer" onclick="mgJoinRoom('damier')">🔗 <span data-tr="mg_join_room">Rejoindre avec code</span></button>
+    </div>
+    <!-- Game area -->
+    <div id="da-game" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div id="da-status" style="color:#81C784;font-size:.85rem;font-weight:700"></div>
+        <div style="display:flex;gap:8px">
+          <div style="background:rgba(255,255,255,.08);padding:4px 10px;border-radius:8px;font-size:.75rem;color:#fff">⚫ <span id="da-score-b">0</span></div>
+          <div style="background:rgba(255,255,255,.08);padding:4px 10px;border-radius:8px;font-size:.75rem;color:#fff">⚪ <span id="da-score-w">0</span></div>
+        </div>
+      </div>
+      <canvas id="da-canvas" width="320" height="320" style="border:2px solid rgba(129,199,132,.3);border-radius:8px;display:block;margin:0 auto;touch-action:none"></canvas>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+        <button class="tbtn" onclick="resetDamier()" style="background:rgba(129,199,132,.1);border:1px solid rgba(129,199,132,.3);color:#81C784;padding:8px 20px;border-radius:10px;cursor:pointer;font-size:.85rem" data-tr="morpion_restart">↩ Rejouer</button>
+        <button class="tbtn" onclick="G('pg-damier');document.getElementById('da-setup').style.display='block';document.getElementById('da-game').style.display='none'" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#8899AA;padding:8px 20px;border-radius:10px;cursor:pointer;font-size:.85rem" data-tr="morpion_menu">Menu</button>
+      </div>
+    </div>
+    <!-- Result modal -->
+    <div id="da-result" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;align-items:center;justify-content:center;flex-direction:column">
+      <div style="background:#1a1a2e;border:2px solid rgba(129,199,132,.3);border-radius:20px;padding:30px;text-align:center;max-width:280px">
+        <div id="da-result-icon" style="font-size:3rem;margin-bottom:10px">🏆</div>
+        <div id="da-result-text" style="font-size:1.2rem;font-weight:900;color:#81C784;margin-bottom:8px"></div>
+        <div id="da-result-coins" style="color:#00E676;font-size:.9rem;margin-bottom:20px"></div>
+        <div style="display:flex;gap:10px;justify-content:center">
+          <button onclick="resetDamier()" style="background:rgba(129,199,132,.15);border:1px solid rgba(129,199,132,.4);color:#81C784;padding:10px 20px;border-radius:12px;cursor:pointer;font-weight:700" data-tr="morpion_restart">↩ Rejouer</button>
+          <button onclick="closeDaResult()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;padding:10px 20px;border-radius:12px;cursor:pointer" data-tr="morpion_menu">Menu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- MINI-GAMES ONLINE WAITING ROOM -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="pg" id="pg-mg-online" style="background:#0a0a1a">
+  <div class="menu-header">
+    <button onclick="mgLeaveRoom()" style="background:none;border:none;color:#64B5F6;font-size:1.4rem;cursor:pointer;padding:4px 8px">‹</button>
+    <div id="mg-online-title" class="logo" style="font-size:1.1rem;color:#64B5F6">Online</div>
+    <div class="chud" style="font-size:.85rem;padding:4px 10px">🪙 <span id="mg-ol-coins">0</span></div>
+  </div>
+  <div style="padding:20px;max-width:360px;margin:0 auto;text-align:center">
+
+    <!-- HOST VIEW -->
+    <div id="mg-host-view">
+      <div style="color:#8899AA;font-size:.8rem;margin-bottom:6px" data-tr="mg_your_code">TON CODE DE ROOM</div>
+      <div id="mg-room-code-display" style="font-size:2.5rem;font-weight:900;letter-spacing:8px;color:#FFD700;background:rgba(255,215,0,.08);border:2px solid rgba(255,215,0,.3);border-radius:16px;padding:16px;margin-bottom:16px">------</div>
+      <button onclick="mgCopyCode()" style="background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.3);color:#FFD700;padding:10px 24px;border-radius:10px;cursor:pointer;font-size:.85rem;margin-bottom:20px" data-tr="mg_copy_code">📋 Copier le code</button>
+      <div style="color:#64B5F6;font-size:.85rem;margin-bottom:8px" data-tr="mg_waiting_opponent">En attente d'un adversaire...</div>
+      <div style="display:flex;justify-content:center;gap:6px;margin-bottom:20px">
+        <div style="width:8px;height:8px;background:#64B5F6;border-radius:50%;animation:pulse 1.2s infinite"></div>
+        <div style="width:8px;height:8px;background:#64B5F6;border-radius:50%;animation:pulse 1.2s .4s infinite"></div>
+        <div style="width:8px;height:8px;background:#64B5F6;border-radius:50%;animation:pulse 1.2s .8s infinite"></div>
+      </div>
+      <div id="mg-guest-joined" style="display:none;background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.3);border-radius:12px;padding:12px;margin-bottom:16px">
+        <div style="color:#00E676;font-weight:700" id="mg-guest-name">—</div>
+        <div style="color:#8899AA;font-size:.75rem" data-tr="mg_joined">a rejoint la room !</div>
+      </div>
+      <button id="mg-start-btn" onclick="mgStartGame()" style="display:none;width:100%;background:rgba(0,230,118,.15);border:2px solid rgba(0,230,118,.4);color:#00E676;padding:14px;border-radius:12px;cursor:pointer;font-size:1rem;font-weight:900" data-tr="mg_start_game">▶ LANCER LA PARTIE</button>
+    </div>
+
+    <!-- GUEST VIEW -->
+    <div id="mg-guest-view" style="display:none">
+      <div style="color:#8899AA;font-size:.8rem;margin-bottom:6px" data-tr="mg_enter_code">ENTRER LE CODE</div>
+      <input id="mg-join-input" type="text" maxlength="6" placeholder="XXXXXX"
+        style="width:100%;text-align:center;font-size:2rem;font-weight:900;letter-spacing:6px;color:#FFD700;background:rgba(255,215,0,.05);border:2px solid rgba(255,215,0,.2);border-radius:12px;padding:14px;box-sizing:border-box;margin-bottom:14px;text-transform:uppercase"
+        oninput="this.value=this.value.toUpperCase()">
+      <button onclick="mgConfirmJoin()" style="width:100%;background:rgba(0,150,255,.15);border:2px solid rgba(0,150,255,.4);color:#64B5F6;padding:14px;border-radius:12px;cursor:pointer;font-size:1rem;font-weight:900;margin-bottom:12px" data-tr="mg_join_btn">🔗 REJOINDRE</button>
+      <div id="mg-join-status" style="color:#8899AA;font-size:.85rem;min-height:20px"></div>
+      <div id="mg-waiting-start" style="display:none;margin-top:16px">
+        <div style="color:#00E676;font-size:.9rem;margin-bottom:8px" data-tr="mg_waiting_host">En attente du lancement par l'hôte...</div>
+        <div style="display:flex;justify-content:center;gap:6px">
+          <div style="width:8px;height:8px;background:#00E676;border-radius:50%;animation:pulse 1.2s infinite"></div>
+          <div style="width:8px;height:8px;background:#00E676;border-radius:50%;animation:pulse 1.2s .4s infinite"></div>
+          <div style="width:8px;height:8px;background:#00E676;border-radius:50%;animation:pulse 1.2s .8s infinite"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- GOMOKU PAGE (5 en ligne sur grille 15x15) -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="pg" id="pg-gomoku" style="background:#0a0a1a">
+  <div class="menu-header">
+    <button onclick="G('pg-menu')" style="background:none;border:none;color:#CE93D8;font-size:1.4rem;cursor:pointer;padding:4px 8px">‹</button>
+    <div class="logo" style="font-size:1.2rem;color:#CE93D8" data-tr="gomoku_title">Gomoku</div>
+    <div class="chud" style="font-size:.85rem;padding:4px 10px">🪙 <span id="go-coins">0</span></div>
+  </div>
+  <div style="padding:12px;max-width:400px;margin:0 auto">
+    <!-- Mode selector -->
+    <div id="go-setup" style="text-align:center">
+      <div style="color:#8899AA;font-size:.8rem;letter-spacing:2px;margin-bottom:14px" data-tr="gomoku_choose_mode">CHOISIR LE MODE</div>
+      <button class="tbtn" style="width:100%;margin-bottom:10px;background:rgba(206,147,216,.1);border:1px solid rgba(206,147,216,.3);color:#CE93D8;padding:14px;border-radius:12px;font-size:1rem;cursor:pointer" onclick="startGomoku('2p')">👥 <span data-tr="morpion_2p">2 Joueurs</span></button>
+      <!-- Vs IA + difficulty -->
+      <div style="background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.2);border-radius:14px;padding:12px;margin-bottom:10px">
+        <div style="color:#00E676;font-size:.85rem;font-weight:700;margin-bottom:8px">🤖 <span data-tr="morpion_vs_ai">Vs IA</span></div>
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <button onclick="setGoDiff('easy')" id="go-diff-easy" style="flex:1;padding:7px 4px;border-radius:8px;border:2px solid rgba(0,230,118,.5);background:rgba(0,230,118,.2);color:#00E676;font-size:.75rem;font-weight:700;cursor:pointer" data-tr="diff_easy">😊 Facile</button>
+          <button onclick="setGoDiff('normal')" id="go-diff-normal" style="flex:1;padding:7px 4px;border-radius:8px;border:2px solid rgba(255,255,255,.15);background:transparent;color:#8899AA;font-size:.75rem;font-weight:700;cursor:pointer" data-tr="diff_normal">😐 Normal</button>
+          <button onclick="setGoDiff('hard')" id="go-diff-hard" style="flex:1;padding:7px 4px;border-radius:8px;border:2px solid rgba(255,255,255,.15);background:transparent;color:#8899AA;font-size:.75rem;font-weight:700;cursor:pointer" data-tr="diff_hard">😈 Difficile</button>
+        </div>
+        <button onclick="startGomoku('ai')" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(0,230,118,.4);background:rgba(0,230,118,.1);color:#00E676;font-size:.9rem;cursor:pointer" data-tr="diff_start_ai">▶ Jouer vs IA</button>
+      </div>
+      <div style="font-size:.75rem;letter-spacing:2px;color:#8899AA;margin:10px 0 6px;text-align:left" data-tr="menu_online_section">🌐 ONLINE</div>
+      <button class="tbtn" style="width:100%;margin-bottom:6px;background:rgba(0,150,255,.1);border:1px solid rgba(0,150,255,.3);color:#64B5F6;padding:14px;border-radius:12px;font-size:1rem;cursor:pointer" onclick="mgCreateRoom('gomoku')">🌐 <span data-tr="mg_create_room">Créer une room</span> <span style="font-size:.75rem;color:#8899AA">15🪙</span></button>
+      <button class="tbtn" style="width:100%;margin-bottom:10px;background:rgba(0,100,255,.07);border:1px solid rgba(0,100,255,.2);color:#90CAF9;padding:12px;border-radius:12px;font-size:.95rem;cursor:pointer" onclick="mgJoinRoom('gomoku')">🔗 <span data-tr="mg_join_room">Rejoindre avec code</span></button>
+    </div>
+    <!-- Game area -->
+    <div id="go-game" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div id="go-status" style="color:#CE93D8;font-size:.85rem;font-weight:700"></div>
+        <div style="display:flex;gap:8px">
+          <div style="background:rgba(255,255,255,.08);padding:4px 10px;border-radius:8px;font-size:.75rem">⚫ <span id="go-score-b">0</span></div>
+          <div style="background:rgba(255,255,255,.08);padding:4px 10px;border-radius:8px;font-size:.75rem">⚪ <span id="go-score-w">0</span></div>
+        </div>
+      </div>
+      <div style="overflow:auto;-webkit-overflow-scrolling:touch">
+        <canvas id="go-canvas" style="display:block;border:2px solid rgba(206,147,216,.3);border-radius:8px;touch-action:none"></canvas>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:10px">
+        <button onclick="resetGomoku()" style="background:rgba(206,147,216,.1);border:1px solid rgba(206,147,216,.3);color:#CE93D8;padding:8px 20px;border-radius:10px;cursor:pointer;font-size:.85rem" data-tr="morpion_restart">↩ Rejouer</button>
+        <button onclick="G('pg-gomoku');document.getElementById('go-setup').style.display='block';document.getElementById('go-game').style.display='none'" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#8899AA;padding:8px 20px;border-radius:10px;cursor:pointer;font-size:.85rem" data-tr="morpion_menu">Menu</button>
+      </div>
+    </div>
+    <!-- Result modal -->
+    <div id="go-result" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;align-items:center;justify-content:center;flex-direction:column">
+      <div style="background:#1a1a2e;border:2px solid rgba(206,147,216,.3);border-radius:20px;padding:30px;text-align:center;max-width:280px">
+        <div id="go-result-icon" style="font-size:3rem;margin-bottom:10px">🏆</div>
+        <div id="go-result-text" style="font-size:1.2rem;font-weight:900;color:#CE93D8;margin-bottom:8px"></div>
+        <div id="go-result-coins" style="color:#00E676;font-size:.9rem;margin-bottom:20px"></div>
+        <div style="display:flex;gap:10px;justify-content:center">
+          <button onclick="resetGomoku()" style="background:rgba(206,147,216,.15);border:1px solid rgba(206,147,216,.4);color:#CE93D8;padding:10px 20px;border-radius:12px;cursor:pointer;font-weight:700" data-tr="morpion_restart">↩ Rejouer</button>
+          <button onclick="closeGoResult()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;padding:10px 20px;border-radius:12px;cursor:pointer" data-tr="morpion_menu">Menu</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 </body>
