@@ -2,6 +2,9 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>NationRush</title>
 
@@ -47,13 +50,60 @@
 // ═══════════════════════════════════════════════════════════
 
 // ─── 1. ENREGISTRER LE SERVICE WORKER (fichier statique) ──
+// ── VERSION CHECK — force cache clear on update ──
+var NR_VERSION = '2.1.0';
+(function(){
+  try{
+    var saved = localStorage.getItem('nr_app_version');
+    if(saved !== NR_VERSION){
+      // New version detected — clear everything
+      localStorage.setItem('nr_app_version', NR_VERSION);
+      if(window.caches){
+        caches.keys().then(function(names){
+          names.forEach(function(n){ caches.delete(n); });
+        });
+      }
+      if('serviceWorker' in navigator){
+        navigator.serviceWorker.getRegistrations().then(function(regs){
+          regs.forEach(function(r){ r.unregister(); });
+        });
+      }
+      // Reload once to get fresh content (only if not already reloading)
+      if(!sessionStorage.getItem('nr_reloaded_'+NR_VERSION)){
+        sessionStorage.setItem('nr_reloaded_'+NR_VERSION,'1');
+        window.location.reload(true);
+      }
+    }
+  }catch(e){}
+})();
+
 var _deferredInstallPrompt = null;
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
+    // Force update: unregister old SW and clear caches when new version detected
+    navigator.serviceWorker.getRegistrations().then(function(regs){
+      regs.forEach(function(reg){ reg.update(); });
+    });
+    // Clear all old caches to force fresh load
+    if(window.caches){
+      caches.keys().then(function(names){
+        names.forEach(function(name){ caches.delete(name); });
+      });
+    }
     navigator.serviceWorker.register('/sw.js', { scope: '/' })
       .then(function(reg) {
         console.log('[SW] Enregistré ✅ scope:', reg.scope);
+        // Force immediate activation of new SW
+        if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
+        reg.addEventListener('updatefound', function(){
+          var newSW = reg.installing;
+          if(newSW) newSW.addEventListener('statechange', function(){
+            if(newSW.state==='installed' && navigator.serviceWorker.controller){
+              newSW.postMessage({type:'SKIP_WAITING'});
+            }
+          });
+        });
       })
       .catch(function(err) {
         console.warn('[SW] Échec:', err);
