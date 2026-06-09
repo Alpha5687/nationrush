@@ -2650,9 +2650,9 @@ function _initRealtime(roomCode, playerId){
           }
           oppHorse.tapBoost = 2.0;
           oppHorse.lastTap = performance.now(); // CRITIQUE: sans ça le cheval s'arrête après 150ms
-          if(d.pos >= 97 && !oppHorse.finished){
+          if((d.finished||d.pos>=97) && !oppHorse.finished){
             oppHorse.finished = true;
-            oppHorse.finishTime = d.t - (window._raceStartT||0);
+            oppHorse.finishTime=(d.finishTime&&d.finishTime>0)?d.finishTime:(d.t-(window._raceStartT||0));
             PLACE++; oppHorse.place = PLACE;
           }
         }
@@ -4849,9 +4849,7 @@ function isModeUnlocked(mode){
   if(isAdmin())return true;
   if(!U)return false;
   const um=U.unlockedModes||{};
-  if(mode==='solo'||mode==='1v1')return true;
-  if(mode==='3p')return !!(um['3p']);
-  if(mode==='2v2')return !!(um['2v2']);
+  if(mode==='solo'||mode==='1v1'||mode==='3p'||mode==='2v2')return true;
   if(mode==='online')return !!(um['online']);
   if(mode==='multi-online')return !!(um['multi-online']);
   if(mode==='2v2-online')return !!(um['2v2-online']);
@@ -4863,8 +4861,8 @@ function isModeUnlocked(mode){
 function isPrevUnlocked(mode){
   const um=U?U.unlockedModes||{}:{};
   if(mode==='3p') return true;
-  if(mode==='2v2') return !!(um['3p']);
-  if(mode==='online') return !!(um['2v2']);
+  if(mode==='2v2') return true;
+  if(mode==='online') return true; // local modes are always free, online just needs account
   if(mode==='multi-online') return !!(um['online']);
   if(mode==='2v2-online') return !!(um['multi-online']);
   if(mode==='team-battle') return !!(um['2v2-online']);
@@ -5188,7 +5186,7 @@ function drawH(canvas,h,phase,moving){
 
   // FLAG on saddle — large and centered
   ctx.save();
-  ctx.font = 'bold 20px serif';
+  ctx.font = 'bold 20px serif, Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.shadowColor = 'rgba(0,0,0,0.95)'; ctx.shadowBlur = 8;
   ctx.fillText(h.flag, 54, 38);
@@ -5869,6 +5867,12 @@ function raceLoop(ts){
       const totalHorses=RACE_HORSES.length;
       if(totalHorses<=3 && fin>=totalHorses) endNow=true;
       else if(totalHorses>3 && PLACE>=3) endNow=true;
+      // Broadcast final position immediately when player finishes
+      if(h.isPlayer&&_rtChannel&&_myPlayerId){
+        var _fh=h;
+        setTimeout(function(){try{_rtChannel.send({type:'broadcast',event:'tap',payload:{playerId:_myPlayerId,pos:_fh.pos,t:performance.now(),finished:true,finishTime:_fh.finishTime}});}catch(e){}},50);
+        setTimeout(function(){try{_rtChannel.send({type:'broadcast',event:'tap',payload:{playerId:_myPlayerId,pos:_fh.pos,t:performance.now(),finished:true,finishTime:_fh.finishTime}});}catch(e){}},200);
+      }
     }
   });
 
@@ -6208,7 +6212,6 @@ window.addEventListener('load',()=>{
     const creator=params.get('creator');
     const type=params.get('type')||'';
     const inv=params.get('inv')||'';
-    // Affiliate link: ?creator=CODE&type=affiliate OR ?ref=CODE&type=friend&inv=---creator
     if((creator&&type==='affiliate')||(ref&&type==='friend'&&inv==='---creator')){
       const affCode=creator||ref;
       localStorage.setItem('nr_pending_creator',affCode);
@@ -6565,7 +6568,9 @@ function _pushMyTaps(){
       payload: {
         playerId: _myPlayerId,
         pos: myHorse.pos,
-        t: performance.now()
+        t: performance.now(),
+        finished: myHorse.finished?true:false,
+        finishTime: myHorse.finishTime||null
       }
     });
   }catch(e){}
@@ -7613,9 +7618,7 @@ function isModeUnlocked(mode){
   if(isAdmin())return true;
   if(!U)return false;
   const um=U.unlockedModes||{};
-  if(mode==='solo'||mode==='1v1')return true;
-  if(mode==='3p')return !!(um['3p']);
-  if(mode==='2v2')return !!(um['2v2']);
+  if(mode==='solo'||mode==='1v1'||mode==='3p'||mode==='2v2')return true;
   if(mode==='online')return !!(um['online']);
   if(mode==='multi-online')return !!(um['multi-online']);
   if(mode==='2v2-online')return !!(um['2v2-online']);
@@ -7738,11 +7741,8 @@ async function _loadAffiliateLineage(){
         } else if(apiData && typeof apiData.revenue!=='undefined'){
           totalRevenue=parseFloat(apiData.revenue)||0;
         }
-        // Commission proportionnelle : (pubs lignée / pubs site total) * revenus site * 2%
-        // Récupérer le total des pubs vues sur tout le site pour ce mois
         var totalSiteAds=0;
-        try{
-          var siteStatsRows=await sbFetch('nr_ad_views?select=ref_code&limit=10000')||[];
+        try{var siteStatsRows=await sbFetch('nr_ad_views?select=ref_code&limit=10000')||[];
           totalSiteAds=siteStatsRows.length||1;
         }catch(eSa){totalSiteAds=Math.max(totalAds,1);}
         var myShare=totalSiteAds>0?totalAds/totalSiteAds:0;
@@ -8068,12 +8068,9 @@ function applyPendingRef(){
     const type=params.get('type');
 
     var inv=params.get('inv')||'';
-    // Lien AFFILIÉ : ?creator=CODE&type=affiliate OU ?ref=CODE&type=friend&inv=---creator
     var isCreatorLink=(creator&&type==='affiliate')||(ref&&type==='friend'&&inv==='---creator');
-    var creatorRefCode=creator||ref||'';
-    if(isCreatorLink&&creatorRefCode){
-      // Lien AFFILIÉ — marquer cette personne comme affiliée
-      localStorage.setItem('nr_pending_creator', creatorRefCode);
+    if(isCreatorLink&&(creator||ref)){
+      localStorage.setItem('nr_pending_creator', creator||ref);
       localStorage.setItem('nr_is_affiliate', 'true');
       toast(t('toast_welcome_affiliate'));
     } else if(ref&&(type==='friend'||!type)){
