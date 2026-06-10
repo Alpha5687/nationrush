@@ -2649,6 +2649,7 @@ let RACE_CT=0;
 let RACE_ON=false, RACE_START=0, LAST_TS=0, LEG=0, PLACE=0;
 let PI=0, P2I=1, T1I=0, T2I=1;
 let AD_CB=null;
+var _lastGamePage = null; // Page active avant la pub
 let P1C=null,P2C=null,T1C=null,T2C=null,SOC=null;
 let PK_MODE='',PK_PLAYER=0;
 let ATAP=0,ATAP_T=null;
@@ -4904,8 +4905,11 @@ function collectAd(){
   }
 
   if(AD_CB){AD_CB();AD_CB=null;}else{
-    // Retourner a la page du mode de jeu precedent
-    if(RACE_MODE==='solo') G('pg-menu');
+    // Retourner à la page où le joueur était avant la pub
+    if(_lastGamePage && document.getElementById(_lastGamePage)){
+      G(_lastGamePage);
+      _lastGamePage=null;
+    } else if(RACE_MODE==='solo') G('pg-menu');
     else if(RACE_MODE==='1v1') G('pg-1v1');
     else if(RACE_MODE==='3p') G('pg-3p');
     else if(RACE_MODE==='2v2') G('pg-2v2');
@@ -9424,6 +9428,9 @@ var MG_GAME_CT = 0;
 function mgCountGame(){
   MG_GAME_CT++;
   if(MG_GAME_CT % 2 === 0){
+    // Sauvegarder la page actuelle avant la pub
+    var activePg = document.querySelector('.pg.active');
+    if(activePg) _lastGamePage = activePg.id;
     setTimeout(function(){ if(typeof showAd==='function') showAd(); }, 1500);
   }
 }
@@ -9554,7 +9561,12 @@ function moEndGame(result){
 }
 function resetMorpion(){
   document.getElementById('mo-result').style.display='none';
-  startMorpion(MO.mode);
+  if(MO.mode==='online'){
+    // Online: recréer une room automatiquement
+    mgRestartOnline('morpion');
+  } else {
+    startMorpion(MO.mode);
+  }
 }
 function closeMoResult(){
   document.getElementById('mo-result').style.display='none';
@@ -10142,7 +10154,11 @@ function daEndGame(winner){
 
 function resetDamier(){
   document.getElementById('da-result').style.display='none';
-  startDamier(DA.mode);
+  if(DA.mode==='online'){
+    mgRestartOnline('damier');
+  } else {
+    startDamier(DA.mode);
+  }
 }
 function closeDaResult(){
   document.getElementById('da-result').style.display='none';
@@ -10167,6 +10183,28 @@ var MG_ONLINE = {
 };
 
 // ── NAVIGATION ──
+// ── REJOUER ONLINE — recréer room automatiquement ──
+function mgRestartOnline(game){
+  var wasHost = MG_ONLINE.role === 'host';
+  mgCloseChannel();
+  if(MG_ONLINE.pollId){ clearInterval(MG_ONLINE.pollId); MG_ONLINE.pollId=null; }
+  // Supprimer l'ancienne room
+  if(MG_ONLINE.roomCode){
+    sbFetch('nr_rooms?code=eq.'+MG_ONLINE.roomCode,{method:'DELETE',prefer:'return=minimal'}).catch(function(){});
+  }
+  if(wasHost){
+    // L'hôte recrée une room — le guest doit rejoindre avec le nouveau code
+    toast('🔄 Nouvelle room créée !');
+    mgCreateRoom(game);
+  } else {
+    // Le guest retourne au setup pour rejoindre la nouvelle room de l'hôte
+    G('pg-'+game);
+    document.getElementById(game==='morpion'?'mo-setup':game==='gomoku'?'go-setup':'da-setup').style.display='block';
+    document.getElementById(game==='morpion'?'mo-game':game==='gomoku'?'go-game':'da-game').style.display='none';
+    toast(t('mg_waiting_host'));
+  }
+}
+
 function mgCreateRoom(game){
   if(!U){toast(t('toast_please_login'));G('pg-login');return;}
   // Accept master code OR coins (like NationRush online)
@@ -10894,7 +10932,11 @@ function goEndGame(winner){
 
 function resetGomoku(){
   document.getElementById('go-result').style.display = 'none';
-  startGomoku(GO.mode);
+  if(GO.mode==='online'){
+    mgRestartOnline('gomoku');
+  } else {
+    startGomoku(GO.mode);
+  }
 }
 
 function closeGoResult(){
