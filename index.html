@@ -2649,7 +2649,8 @@ let RACE_CT=0;
 let RACE_ON=false, RACE_START=0, LAST_TS=0, LEG=0, PLACE=0;
 let PI=0, P2I=1, T1I=0, T2I=1;
 let AD_CB=null;
-var _lastGamePage = null; // Page active avant la pub
+var _lastGamePage = null;    // Page active avant la pub
+var _lastResultModal = null; // Modal résultat ouvert avant la pub
 let P1C=null,P2C=null,T1C=null,T2C=null,SOC=null;
 let PK_MODE='',PK_PLAYER=0;
 let ATAP=0,ATAP_T=null;
@@ -4910,9 +4911,15 @@ function collectAd(){
   }
 
   if(AD_CB){AD_CB();AD_CB=null;}else{
-    // Retourner à la page où le joueur était avant la pub
+    // Retourner à la page + modal résultat où le joueur était avant la pub
     if(_lastGamePage && document.getElementById(_lastGamePage)){
       G(_lastGamePage);
+      // Ré-afficher le modal résultat s'il était ouvert
+      if(_lastResultModal){
+        var rm=document.getElementById(_lastResultModal);
+        if(rm) rm.style.display='flex';
+        _lastResultModal=null;
+      }
       _lastGamePage=null;
     } else if(RACE_MODE==='solo') G('pg-menu');
     else if(RACE_MODE==='1v1') G('pg-1v1');
@@ -9447,9 +9454,17 @@ var MG_GAME_CT = 0;
 function mgCountGame(){
   MG_GAME_CT++;
   if(MG_GAME_CT % 2 === 0){
-    // Sauvegarder la page actuelle avant la pub
+    // Sauvegarder la page active + le modal résultat ouvert
     var activePg = document.querySelector('.pg.active');
     if(activePg) _lastGamePage = activePg.id;
+    var results=['mo-result','go-result','da-result','tet-over'];
+    _lastResultModal=null;
+    for(var i=0;i<results.length;i++){
+      var r=document.getElementById(results[i]);
+      if(r&&(r.style.display==='flex'||r.style.display==='block')){
+        _lastResultModal=results[i]; break;
+      }
+    }
     setTimeout(function(){ if(typeof showAd==='function') showAd(); }, 1500);
   }
 }
@@ -10198,7 +10213,8 @@ var MG_ONLINE = {
   channel: null,
   pollId: null,
   active: false,
-  cost: 15
+  cost: 15,
+  _oppWantsRematch: false
 };
 
 // ── NAVIGATION ──
@@ -10222,44 +10238,63 @@ var _mg_unlock_game = null;
 // ── REJOUER ONLINE — les deux joueurs confirment via Realtime ──
 var MG_RESTART_PENDING = false;
 
+// Helper: show waiting state on result page
+function mgShowWaitingResult(game){
+  var resultId = game==='morpion'?'mo-result':game==='gomoku'?'go-result':'da-result';
+  var textId   = game==='morpion'?'mo-result-text':game==='gomoku'?'go-result-text':'da-result-text';
+  var iconId   = game==='morpion'?'mo-result-icon':game==='gomoku'?'go-result-icon':'da-result-icon';
+  var coinsId  = game==='morpion'?'mo-result-coins':game==='gomoku'?'go-result-coins':'da-result-coins';
+  // Keep result visible but show waiting message
+  var res=document.getElementById(resultId); if(res) res.style.display='flex';
+  var ic=document.getElementById(iconId);   if(ic) ic.textContent='⏳';
+  var tx=document.getElementById(textId);   if(tx) tx.textContent='En attente de '+(MG_ONLINE.oppName||'adversaire')+'...';
+  var co=document.getElementById(coinsId);  if(co) co.textContent='';
+}
+
+// Helper: actually launch new game round
+function mgDoRelaunch(game){
+  MG_RESTART_PENDING = false;
+  // Deduct coins for new round
+  if(U&&!isAdmin()){U.coins=(U.coins||0)-MG_ONLINE.cost;saveU();syncMiniCoins();}
+  // Hide result, launch game board
+  var resultId=game==='morpion'?'mo-result':game==='gomoku'?'go-result':'da-result';
+  var el=document.getElementById(resultId); if(el) el.style.display='none';
+  setTimeout(function(){
+    if(game==='morpion')      mgLaunchMorpion();
+    else if(game==='gomoku')  mgLaunchGomoku();
+    else if(game==='damier')  mgLaunchDamier();
+  },300);
+}
+
 function mgRestartOnline(game){
-  // Envoyer signal à l'adversaire
   MG_RESTART_PENDING = true;
+  // Send rematch signal to opponent
   if(MG_ONLINE.channel){
     try{
       MG_ONLINE.channel.send({type:'broadcast',event:'mg_rematch',
-        payload:{from:MG_ONLINE.role,game:game}});
+        payload:{game:game}});
     }catch(e){}
   }
-  // Mettre la page résultat en mode "attente"
-  var textId = game==='morpion'?'mo-result-text':game==='gomoku'?'go-result-text':'da-result-text';
-  var iconId = game==='morpion'?'mo-result-icon':game==='gomoku'?'go-result-icon':'da-result-icon';
-  var coinsId = game==='morpion'?'mo-result-coins':game==='gomoku'?'go-result-coins':'da-result-coins';
-  var el=document.getElementById(textId); if(el) el.textContent='⏳ En attente de '+(MG_ONLINE.oppName||'adversaire')+'...';
-  var ic=document.getElementById(iconId); if(ic) ic.textContent='⏳';
-  var co=document.getElementById(coinsId); if(co) co.textContent='';
-  // Résultat reste visible (affichage attente)
+  // If opponent already clicked rematch (their signal arrived first)
+  if(MG_ONLINE._oppWantsRematch){
+    MG_ONLINE._oppWantsRematch = false;
+    mgDoRelaunch(game); // Both confirmed — go!
+    return;
+  }
+  // Otherwise show waiting on result page
+  mgShowWaitingResult(game);
 }
 
 function mgHandleRematch(data){
   var game=data.game||MG_ONLINE.game;
-  if(!MG_RESTART_PENDING){
-    // L'adversaire a cliqué rejouer — notifier et attendre que je clique aussi
-    toast('🔄 '+(MG_ONLINE.oppName||'Adversaire')+' veut rejouer !');
-    return;
+  if(MG_RESTART_PENDING){
+    // I already clicked — opponent just confirmed — launch!
+    mgDoRelaunch(game);
+  } else {
+    // Opponent clicked first — store it and wait for me
+    MG_ONLINE._oppWantsRematch = true;
+    toast('🔄 '+(MG_ONLINE.oppName||'Adversaire')+' veut rejouer ! Cliquez Rejouer.');
   }
-  // Les DEUX ont confirmé — relancer le jeu directement
-  MG_RESTART_PENDING = false;
-  // Déduire 15 coins pour la nouvelle partie
-  if(U&&!isAdmin()){U.coins=(U.coins||0)-MG_ONLINE.cost;saveU();syncMiniCoins();}
-  // Cacher résultat et relancer la grille de jeu
-  var resultId = game==='morpion'?'mo-result':game==='gomoku'?'go-result':'da-result';
-  var el=document.getElementById(resultId); if(el) el.style.display='none';
-  setTimeout(function(){
-    if(game==='morpion') mgLaunchMorpion();
-    else if(game==='gomoku') mgLaunchGomoku();
-    else if(game==='damier') mgLaunchDamier();
-  },300);
 }
 
 function mgCreateRoom(game){
