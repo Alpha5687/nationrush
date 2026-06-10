@@ -9905,15 +9905,16 @@ function daGetMoves(board,r,c,captureOnly){
         var target=board[nr][nc];
         if(target===0){
           if(!captureOnly||captured){
+            // Dame peut se placer sur TOUTES les cases vides après le pion capturé
             moves.push({fr:r,fc:c,tr:nr,tc:nc,cr:capturedR,cc:capturedC,cap:captured!==null});
           }
-          if(captured) break; // Après capture on s'arrête au premier vide
+          // Continuer dans la même direction (ne pas s'arrêter après capture)
           nr+=dr; nc+=dc;
         } else if(daOwner(target)!==owner&&!captured){
           // Pion ennemi — on peut capturer
           captured=target; capturedR=nr; capturedC=nc;
           nr+=dr; nc+=dc;
-        } else { break; }
+        } else { break; } // Bloqué (pion allié ou 2ème ennemi)
       }
     });
   } else {
@@ -10040,11 +10041,28 @@ function daApplyMove(mv){
   if(mv.cap){
     var chain=daGetMoves(b,mv.tr,mv.tc,true).filter(function(m){return m.cap;});
     if(chain.length>0){
-      // Continuer avec la même pièce
-      DA.selected={r:mv.tr,c:mv.tc};
-      DA.validMoves=chain;
       DA.mustCapture=true;
       daDrawBoard();
+      if(DA.mode==='ai'&&DA.turn===2){
+        // IA continue la chaîne automatiquement
+        setTimeout(function(){
+          // Choisir la meilleure capture dans la chaîne
+          var best=chain[Math.floor(Math.random()*chain.length)];
+          if(DIFF.da==='hard'){
+            // Hard: préférer la capture qui ouvre le plus de captures suivantes
+            var bestScore=-1;
+            chain.forEach(function(cm){
+              var next=daGetMoves(b,cm.tr,cm.tc,true).filter(function(x){return x.cap;});
+              if(next.length>bestScore){bestScore=next.length;best=cm;}
+            });
+          }
+          daApplyMove(best);
+        },400);
+        return;
+      }
+      // Humain — sélectionner la pièce pour continuer
+      DA.selected={r:mv.tr,c:mv.tc};
+      DA.validMoves=chain;
       updateDaStatus();
       return;
     }
