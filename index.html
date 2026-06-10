@@ -3137,6 +3137,10 @@ function chkUnlockCode(el){
       else if(UNLOCK_TARGET==='multi-online'){goMultiOnline();}
       else if(UNLOCK_TARGET==='2v2-online'){go2v2Online();}
       else if(UNLOCK_TARGET==='team-battle'){goTeamBattleOnline();}
+      else if(UNLOCK_TARGET==='mg-online'){
+        localStorage.setItem(MG_ONLINE_UNLOCK_KEY,'1');
+        G('pg-menu'); toast('🎮 Mini-jeux Online débloqués !');
+      }
       else{G('pg-menu');}
     },400);
   } else {
@@ -5141,6 +5145,7 @@ function isPrevUnlocked(mode){
   if(mode==='multi-online') return !!(um['online']);
   if(mode==='2v2-online') return !!(um['multi-online']);
   if(mode==='team-battle') return !!(um['2v2-online']);
+  if(mode==='mg-online') return true; // Pas de prérequis pour mini-jeux online
   return true;
 }
 
@@ -5157,7 +5162,11 @@ function unlockWithCoins(){
   toast(t('toast_mode_unlocked'));
   if(UNLOCK_TARGET==='3p'){P1C=null;P2C=null;P3C=null;resetPk3p();G('pg-3p');}
   else if(UNLOCK_TARGET==='2v2'){T1C=null;T2C=null;resetPk2v2();G('pg-2v2');}
-  else if(UNLOCK_TARGET==='online'||UNLOCK_TARGET==='multi-online'){
+  else if(UNLOCK_TARGET==='mg-online'){
+    // Mini-game online unlocked — save in localStorage too
+    localStorage.setItem(MG_ONLINE_UNLOCK_KEY,'1');
+    G('pg-menu'); toast('🎮 Mini-jeux Online débloqués !');
+  } else if(UNLOCK_TARGET==='online'||UNLOCK_TARGET==='multi-online'){
     G('pg-menu');
     setTimeout(function(){
       if(UNLOCK_TARGET==='online') goOnline();
@@ -5171,11 +5180,11 @@ function unlockWithCoins(){
 function showUnlock(mode,cost){
   UNLOCK_TARGET=mode; UNLOCK_COST=cost;
   const $=id=>document.getElementById(id);
-  const icons={'3p':'👥','2v2':'🤝','online':'🌐','multi-online':'🌍','2v2-online':'⚔️','team-battle':'👑'};
+  const icons={'3p':'👥','2v2':'🤝','online':'🌐','multi-online':'🌍','2v2-online':'⚔️','team-battle':'👑','mg-online':'🎮'};
   const names={
     '3p':t('m3_title'),'2v2':t('m4_title'),
     'online':'1v1 Online','multi-online':'Multi Online',
-    '2v2-online':'2v2 Online','team-battle':'Team Battle Online'
+    '2v2-online':'2v2 Online','team-battle':'Team Battle Online','mg-online':'Mini-Jeux Online'
   };
   $('ul-icon').textContent=icons[mode]||'🔒';
   $('ul-title').textContent=t('unlock_title');
@@ -6862,7 +6871,11 @@ var _2v2olCode='', _2v2olPolling=null, _teamSize=2;
 
 function go2v2Online(){
   if(!U){toast(t('toast_please_login'));G('pg-login');return;}
-  if(!isModeUnlocked('2v2-online')){showUnlock('2v2-online',400);return;}
+  if(!isModeUnlocked('2v2-online')){
+    toast('🔒 Mode en développement — Master Code requis');
+    showUnlock('2v2-online',400);
+    return;
+  }
   if(!isAdmin()&&(U.coins||0)<ONLINE_COST){toast(ONLINE_COST+' pieces requises');return;}
   document.getElementById('2v2ol-code').textContent='--';
   document.getElementById('2v2ol-teams').style.display='none';
@@ -7028,7 +7041,11 @@ var _tbCode='', _tbPolling=null;
 
 function goTeamBattleOnline(){
   if(!U){toast(t('toast_please_login'));G('pg-login');return;}
-  if(!isModeUnlocked('team-battle')){showUnlock('team-battle',500);return;}
+  if(!isModeUnlocked('team-battle')){
+    toast('🔒 Mode en développement — Master Code requis');
+    showUnlock('team-battle',500);
+    return;
+  }
   if(!isAdmin()&&(U.coins||0)<ONLINE_COST){toast(ONLINE_COST+' pieces requises');return;}
   _teamSize=2;
   document.querySelectorAll('.pc-btn').forEach(function(b){b.classList.remove('sel');});
@@ -10183,31 +10200,97 @@ var MG_ONLINE = {
 };
 
 // ── NAVIGATION ──
-// ── REJOUER ONLINE — recréer room automatiquement ──
+
+// ── Mini-game online unlock (200 coins one-time OR master code) ──
+var MG_ONLINE_UNLOCK_KEY = 'nr_mg_online_unlocked';
+function isMgOnlineUnlocked(){
+  if(isAdmin()) return true;
+  return !!(U && U.unlockedModes && U.unlockedModes['mg-online']) ||
+         localStorage.getItem(MG_ONLINE_UNLOCK_KEY) === '1';
+}
+function showMgOnlineUnlock(){
+  showUnlock('mg-online', 200);
+}
+// ── REJOUER ONLINE — les deux joueurs confirment via Realtime ──
+var MG_RESTART_PENDING = false;
+
 function mgRestartOnline(game){
-  var wasHost = MG_ONLINE.role === 'host';
-  mgCloseChannel();
-  if(MG_ONLINE.pollId){ clearInterval(MG_ONLINE.pollId); MG_ONLINE.pollId=null; }
-  // Supprimer l'ancienne room
-  if(MG_ONLINE.roomCode){
-    sbFetch('nr_rooms?code=eq.'+MG_ONLINE.roomCode,{method:'DELETE',prefer:'return=minimal'}).catch(function(){});
+  MG_RESTART_PENDING = true;
+  // Envoyer signal "rematch" à l'adversaire via le channel existant
+  if(MG_ONLINE.channel){
+    try{
+      MG_ONLINE.channel.send({type:'broadcast',event:'mg_rematch',payload:{
+        from: MG_ONLINE.role, game: game
+      }});
+    }catch(e){}
   }
-  if(wasHost){
-    // L'hôte recrée une room — le guest doit rejoindre avec le nouveau code
-    toast('🔄 Nouvelle room créée !');
-    mgCreateRoom(game);
-  } else {
-    // Le guest retourne au setup pour rejoindre la nouvelle room de l'hôte
-    G('pg-'+game);
-    document.getElementById(game==='morpion'?'mo-setup':game==='gomoku'?'go-setup':'da-setup').style.display='block';
-    document.getElementById(game==='morpion'?'mo-game':game==='gomoku'?'go-game':'da-game').style.display='none';
-    toast(t('mg_waiting_host'));
+  // Afficher écran d'attente
+  var gameId = game==='morpion'?'pg-morpion':game==='gomoku'?'pg-gomoku':'pg-damier';
+  G(gameId);
+  var setupId = game==='morpion'?'mo-setup':game==='gomoku'?'go-setup':'da-setup';
+  var gameAreaId = game==='morpion'?'mo-game':game==='gomoku'?'go-game':'da-game';
+  var resultId = game==='morpion'?'mo-result':game==='gomoku'?'go-result':'da-result';
+  document.getElementById(setupId).style.display='none';
+  document.getElementById(gameAreaId).style.display='none';
+  document.getElementById(resultId).style.display='none';
+  // Show waiting screen
+  var waitDiv = document.getElementById('mg-rematch-wait-'+game);
+  if(!waitDiv){
+    waitDiv = document.createElement('div');
+    waitDiv.id = 'mg-rematch-wait-'+game;
+    waitDiv.style.cssText='text-align:center;padding:40px 20px;';
+    waitDiv.innerHTML = '<div style="font-size:2rem;margin-bottom:12px">⏳</div>'+
+      '<div style="color:#64B5F6;font-size:1rem;font-weight:700">'+t('mg_waiting_opponent')+'</div>'+
+      '<div style="color:#8899AA;font-size:.8rem;margin-top:8px">En attente de '+(MG_ONLINE.oppName||'adversaire')+'...</div>'+
+      '<button id="mg-cancel-rematch-btn" style="margin-top:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#8899AA;padding:8px 18px;border-radius:10px;cursor:pointer;font-size:.8rem">Annuler</button>';
+    (function(g){
+      var cb=waitDiv.querySelector('#mg-cancel-rematch-btn');
+      if(cb) cb.onclick=function(){ mgCancelRematch(g); };
+    })(game);
+    var pg = document.getElementById(gameId);
+    if(pg) pg.querySelector('div').appendChild(waitDiv);
   }
+  waitDiv.style.display='block';
+}
+
+function mgCancelRematch(game){
+  MG_RESTART_PENDING=false;
+  var waitDiv=document.getElementById('mg-rematch-wait-'+game);
+  if(waitDiv) waitDiv.style.display='none';
+  var setupId=game==='morpion'?'mo-setup':game==='gomoku'?'go-setup':'da-setup';
+  document.getElementById(setupId).style.display='block';
+}
+
+function mgHandleRematch(data){
+  if(!MG_RESTART_PENDING){
+    // Adversaire veut rejouer — me demander aussi
+    MG_RESTART_PENDING=true;
+    toast('🔄 '+(MG_ONLINE.oppName||'Adversaire')+' veut rejouer !');
+    // Auto-confirm after 3s or wait for user action
+  }
+  // Les deux ont confirmé — relancer la partie
+  var game=data.game||MG_ONLINE.game;
+  MG_RESTART_PENDING=false;
+  var waitDiv=document.getElementById('mg-rematch-wait-'+game);
+  if(waitDiv) waitDiv.style.display='none';
+  // Déduire 15 coins pour la nouvelle partie
+  if(U&&!isAdmin()){U.coins=(U.coins||0)-MG_ONLINE.cost;saveU();syncMiniCoins();}
+  // Relancer le jeu (board vierge, même room, même channel)
+  setTimeout(function(){
+    if(game==='morpion') mgLaunchMorpion();
+    else if(game==='gomoku') mgLaunchGomoku();
+    else if(game==='damier') mgLaunchDamier();
+  },500);
 }
 
 function mgCreateRoom(game){
   if(!U){toast(t('toast_please_login'));G('pg-login');return;}
-  // Accept master code OR coins (like NationRush online)
+  // Check mini-game online unlock (200 coins one-time OR master code)
+  if(!isAdmin()&&!isMgOnlineUnlocked()){
+    showMgOnlineUnlock();
+    return;
+  }
+  // Check session cost (15 coins per game)
   if(!isAdmin()&&(U.coins||0)<MG_ONLINE.cost){toast(t('toast_not_enough_coins'));return;}
   MG_ONLINE.game=game;
   MG_ONLINE.role='host';
@@ -10230,6 +10313,10 @@ function mgCreateRoom(game){
 
 function mgJoinRoom(game){
   if(!U){toast(t('toast_please_login'));G('pg-login');return;}
+  if(!isAdmin()&&!isMgOnlineUnlocked()){
+    showMgOnlineUnlock();
+    return;
+  }
   if(!isAdmin()&&(U.coins||0)<MG_ONLINE.cost){toast(t('toast_not_enough_coins'));return;}
   MG_ONLINE.game=game;
   MG_ONLINE.role='guest';
@@ -10389,6 +10476,9 @@ function mgInitChannel(){
     });
     MG_ONLINE.channel.on('broadcast',{event:'mg_end'},function(payload){
       // Opponent signals game end
+    });
+    MG_ONLINE.channel.on('broadcast',{event:'mg_rematch'},function(payload){
+      mgHandleRematch(payload.payload);
     });
     MG_ONLINE.channel.subscribe();
   }catch(e){}
