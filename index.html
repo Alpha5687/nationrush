@@ -183,16 +183,34 @@ div[style*="position: fixed"][style*="bottom: 0"]{
           startY = e.touches[0].clientY;
           startX = e.touches[0].clientX;
         }, {passive:true});
+        bar.addEventListener('touchmove', function(e){
+          var dy = e.touches[0].clientY - startY;
+          var dx = e.touches[0].clientX - startX;
+          // Suivre le doigt en temps réel
+          if(Math.abs(dy) > Math.abs(dx)){
+            bar.style.transform = 'translateY('+dy+'px)';
+          } else {
+            bar.style.transform = 'translateX('+dx+'px)';
+          }
+        }, {passive:true});
         bar.addEventListener('touchend', function(e){
           var dy = e.changedTouches[0].clientY - startY;
-          var dx = Math.abs(e.changedTouches[0].clientX - startX);
-          // Glisser vers le bas OU gauche/droite pour fermer
-          if(dy > 40 || dx > 80){
-            // Minimise temporairement — revient après 8 secondes
-            bar.style.transform = 'translateY(110%)';
-            setTimeout(function(){ 
-              bar.style.transform = 'translateY(0)';
-            }, 8000);
+          var dx = e.changedTouches[0].clientX - startX;
+          var adx = Math.abs(dx);
+          // Si glissé suffisamment — cacher 10 secondes puis revenir
+          if(dy > 50 || adx > 80){
+            if(adx > Math.abs(dy)){
+              bar.style.transform = 'translateX('+(dx>0?'150%':'-150%')+')';
+            } else {
+              bar.style.transform = 'translateY(150%)';
+            }
+            setTimeout(function(){
+              bar.style.transition = 'transform 0.4s ease';
+              bar.style.transform = 'translateY(0) translateX(0)';
+            }, 10000);
+          } else {
+            // Snap back
+            bar.style.transform = 'translateY(0) translateX(0)';
           }
         }, {passive:true});
       }
@@ -9455,7 +9473,7 @@ function mgCountGame(){
   MG_GAME_CT++;
   if(MG_GAME_CT % 2 === 0){
     // Sauvegarder la page active + le modal résultat ouvert
-    var activePg = document.querySelector('.pg.active');
+    var activePg = document.querySelector('.pg.on');
     if(activePg) _lastGamePage = activePg.id;
     var results=['mo-result','go-result','da-result','tet-over'];
     _lastResultModal=null;
@@ -9606,6 +9624,12 @@ function closeMoResult(){
   document.getElementById('mo-result').style.display='none';
   document.getElementById('mo-setup').style.display='block';
   document.getElementById('mo-game').style.display='none';
+  // Close channel and delete room when leaving
+  if(MO.mode==='online'){
+    mgCloseChannel();
+    if(MG_ONLINE.roomCode) sbFetch('nr_rooms?code=eq.'+MG_ONLINE.roomCode,{method:'DELETE',prefer:'return=minimal'}).catch(function(){});
+    MG_ONLINE.roomCode=null;
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -10198,6 +10222,11 @@ function closeDaResult(){
   document.getElementById('da-result').style.display='none';
   document.getElementById('da-setup').style.display='block';
   document.getElementById('da-game').style.display='none';
+  if(DA.mode==='online'){
+    mgCloseChannel();
+    if(MG_ONLINE.roomCode) sbFetch('nr_rooms?code=eq.'+MG_ONLINE.roomCode,{method:'DELETE',prefer:'return=minimal'}).catch(function(){});
+    MG_ONLINE.roomCode=null;
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -10268,8 +10297,16 @@ function mgDoRelaunch(game){
 
 function mgRestartOnline(game){
   MG_RESTART_PENDING = true;
-  // Send rematch signal to opponent
-  if(MG_ONLINE.channel){
+  // Re-init channel if needed (may have been closed)
+  if(!MG_ONLINE.channel && MG_ONLINE.roomCode){
+    mgInitChannel();
+    // Wait a moment for channel to connect then send
+    setTimeout(function(){
+      if(MG_ONLINE.channel){
+        try{ MG_ONLINE.channel.send({type:'broadcast',event:'mg_rematch',payload:{game:game}}); }catch(e){}
+      }
+    }, 800);
+  } else if(MG_ONLINE.channel){
     try{
       MG_ONLINE.channel.send({type:'broadcast',event:'mg_rematch',
         payload:{game:game}});
@@ -10609,9 +10646,7 @@ function mgMorpionEnd(result){
   var isDraw=(result==='draw');
   var coins=iWon?10:isDraw?2:0; // Gagnant +10, nul +2, perdant 0 (a déjà perdu 15)
   if(coins>0&&U){addCoins(coins);syncMiniCoins();}
-  mgCloseChannel();
-  // Delete room
-  if(MG_ONLINE.roomCode) sbFetch('nr_rooms?code=eq.'+MG_ONLINE.roomCode,{method:'DELETE',prefer:'return=minimal'}).catch(function(){});
+  // Keep channel OPEN for rematch — only close when user clicks Menu
   var el=document.getElementById('mo-result');
   el.style.display='flex';
   document.getElementById('mo-result-icon').textContent=isDraw?'🤝':iWon?'🏆':'❌';
@@ -10740,8 +10775,7 @@ function mgDamierEnd(winner){
   var iWon=(winner===DA.myPlayer);
   var coins=iWon?10:0; // Gagnant +10, perdant 0 (a déjà perdu 15)
   if(coins>0&&U){addCoins(coins);syncMiniCoins();}
-  mgCloseChannel();
-  if(MG_ONLINE.roomCode) sbFetch('nr_rooms?code=eq.'+MG_ONLINE.roomCode,{method:'DELETE',prefer:'return=minimal'}).catch(function(){});
+  // Keep channel OPEN for rematch — only close when user clicks Menu
   var el=document.getElementById('da-result');
   el.style.display='flex';
   document.getElementById('da-result-icon').textContent=iWon?'🏆':'❌';
@@ -11047,6 +11081,11 @@ function closeGoResult(){
   document.getElementById('go-result').style.display = 'none';
   document.getElementById('go-setup').style.display = 'block';
   document.getElementById('go-game').style.display = 'none';
+  if(GO.mode==='online'){
+    mgCloseChannel();
+    if(MG_ONLINE.roomCode) sbFetch('nr_rooms?code=eq.'+MG_ONLINE.roomCode,{method:'DELETE',prefer:'return=minimal'}).catch(function(){});
+    MG_ONLINE.roomCode=null;
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
