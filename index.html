@@ -10528,8 +10528,9 @@ function moPlayOnline(i){
 }
 
 function mgHandleOpponentMove(data){
-  if(!MO.active||MG_ONLINE.game!=='morpion') return;
+  if(!data||!data.type) return;
   if(data.type==='morpion'){
+    if(!MO.active) return; // Guard only for morpion
     MO.board[data.cell]=data.symbol;
     renderMoBoard();
     var result=checkMoWin();
