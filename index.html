@@ -2612,6 +2612,8 @@ function showRace(){
 }
 
 function G(id){
+  // Stop tetris when leaving tetris page
+  if(id!=='pg-tetris' && typeof tetPause==='function') tetPause();
   // Remettre display normal sur toutes les pages
   document.querySelectorAll('.pg').forEach(function(p){
     p.classList.remove('on');
@@ -3211,6 +3213,9 @@ const TXT={
     gomoku_lost:'❌ Défaite',gomoku_draw:'🤝 Match nul',
     diff_easy:'😊 Facile',diff_normal:'😐 Normal',diff_hard:'😈 Difficile',
     diff_start_ai:'▶ Jouer vs IA',diff_label:'DIFFICULTÉ',
+    coming_soon_msg:'Ce mode est en cours de développement.',
+    coming_soon_sub:'Revenez bientôt — ça arrive !',
+    btn_close:'Fermer',
     coming_soon:'🔜 BIENTÔT',
     // Boutons TAP
     tap_boost:'⚡ TAP TO BOOST',
@@ -3512,6 +3517,9 @@ const TXT={
     gomoku_lost:'❌ Defeat',gomoku_draw:'🤝 Draw',
     diff_easy:'😊 Easy',diff_normal:'😐 Normal',diff_hard:'😈 Hard',
     diff_start_ai:'▶ Play vs AI',diff_label:'DIFFICULTY',
+    coming_soon_msg:'This mode is under development.',
+    coming_soon_sub:'Check back soon — it\'s coming!',
+    btn_close:'Close',
     coming_soon:'🔜 COMING SOON',
     tap_boost:'⚡ TAP TO BOOST',
     races_count:'RACES',watch_ad_btn:'WATCH AD +2 🪙',
@@ -3806,6 +3814,9 @@ const TXT={
     gomoku_lost:'❌ Derrota',gomoku_draw:'🤝 Empate',
     diff_easy:'😊 Fácil',diff_normal:'😐 Normal',diff_hard:'😈 Difícil',
     diff_start_ai:'▶ Jugar vs IA',diff_label:'DIFICULTAD',
+    coming_soon_msg:'Este modo está en desarrollo.',
+    coming_soon_sub:'¡Vuelve pronto — viene en camino!',
+    btn_close:'Cerrar',
     coming_soon:'🔜 PRÓXIMAMENTE',
     tap_boost:'⚡ TOCA PARA AVANZAR',
     races_count:'CARRERAS',watch_ad_btn:'VER ANUNCIO +2 🪙',
@@ -4096,6 +4107,9 @@ const TXT={
     gomoku_lost:'❌ خسارة',gomoku_draw:'🤝 تعادل',
     diff_easy:'😊 سهل',diff_normal:'😐 عادي',diff_hard:'😈 صعب',
     diff_start_ai:'▶ العب ضد الذكاء',diff_label:'الصعوبة',
+    coming_soon_msg:'هذا الوضع قيد التطوير.',
+    coming_soon_sub:'عد قريباً — إنه قادم!',
+    btn_close:'إغلاق',
     coming_soon:'🔜 قريباً',
     tap_boost:'⚡ انقر للتعزيز',
     races_count:'سباقات',races_label:'سباقات',watch_ad_btn:'شاهد إعلاناً +2 🪙',
@@ -6815,18 +6829,7 @@ function _startTapSync(){
 var _2v2olCode='', _2v2olPolling=null, _teamSize=2;
 
 function go2v2Online(){
-  if(!U){toast(t('toast_please_login'));G('pg-login');return;}
-  if(!isModeUnlocked('2v2-online')){
-    toast('🔒 Mode en développement — Master Code requis');
-    showUnlock('2v2-online',400);
-    return;
-  }
-  if(!isAdmin()&&(U.coins||0)<ONLINE_COST){toast(ONLINE_COST+' pieces requises');return;}
-  document.getElementById('2v2ol-code').textContent='--';
-  document.getElementById('2v2ol-teams').style.display='none';
-  document.getElementById('2v2ol-join-teams').style.display='none';
-  document.getElementById('2v2ol-status').textContent='';
-  G('pg-2v2online');
+  showComingSoon('2v2-online');
 }
 
 function create2v2OnlineRoom(){
@@ -6985,18 +6988,7 @@ function _launch2v2Online(players){
 var _tbCode='', _tbPolling=null;
 
 function goTeamBattleOnline(){
-  if(!U){toast(t('toast_please_login'));G('pg-login');return;}
-  if(!isModeUnlocked('team-battle')){
-    toast('🔒 Mode en développement — Master Code requis');
-    showUnlock('team-battle',500);
-    return;
-  }
-  if(!isAdmin()&&(U.coins||0)<ONLINE_COST){toast(ONLINE_COST+' pieces requises');return;}
-  _teamSize=2;
-  document.querySelectorAll('.pc-btn').forEach(function(b){b.classList.remove('sel');});
-  document.getElementById('tb-room-section').style.display='none';
-  document.getElementById('tb-size-info').textContent='Selectionnez la taille des equipes';
-  G('pg-teambattle');
+  showComingSoon('team-battle');
 }
 
 function selectTeamSize(n){
@@ -9382,8 +9374,8 @@ updateMenu=function(){
 // ═══════════════════════════════════════════════════════════
 // MINI-GAMES NAVIGATION
 // ═══════════════════════════════════════════════════════════
-function goMorpion(){G('pg-morpion');syncMiniCoins();}
-function goGomoku(){G('pg-gomoku');syncMiniCoins();}
+function goMorpion(){tetrisPause();G('pg-morpion');syncMiniCoins();}
+function goGomoku(){tetrisPause();G('pg-gomoku');syncMiniCoins();}
 
 // ── Compteur de parties mini-jeux — pub toutes les 2 parties ──
 var MG_GAME_CT = 0;
@@ -9405,7 +9397,7 @@ function mgCountGame(){
   }
 }
 function goTetris(){G('pg-tetris');tetStart();syncMiniCoins();}
-function goDamier(){G('pg-damier');syncMiniCoins();}
+function goDamier(){tetrisPause();G('pg-damier');syncMiniCoins();}
 function syncMiniCoins(){
   var c=U?U.coins||0:0;
   var els=['mo-coins','tet-coins','da-coins'];
@@ -9957,33 +9949,34 @@ function daApplyMove(mv){
 
   // Si capture — vérifier captures en rafale (même pièce)
   if(mv.cap){
-    var chain=daGetMoves(b,mv.tr,mv.tc,true).filter(function(m){return m.cap;});
-    if(chain.length>0){
+    // Recalculer les captures possibles depuis la nouvelle position
+    var chainMoves=daGetMoves(b,mv.tr,mv.tc,true).filter(function(m){return m.cap;});
+    if(chainMoves.length>0){
+      // La chaîne continue — même pièce doit continuer à capturer
       DA.mustCapture=true;
+      DA.selected={r:mv.tr,c:mv.tc};
+      DA.validMoves=chainMoves;
       daDrawBoard();
+      updateDaStatus();
       if(DA.mode==='ai'&&DA.turn===2){
         // IA continue la chaîne automatiquement
+        DA.selected=null; DA.validMoves=[];
         setTimeout(function(){
-          // Choisir la meilleure capture dans la chaîne
-          var best=chain[Math.floor(Math.random()*chain.length)];
+          var best=chainMoves[Math.floor(Math.random()*chainMoves.length)];
           if(DIFF.da==='hard'){
-            // Hard: préférer la capture qui ouvre le plus de captures suivantes
             var bestScore=-1;
-            chain.forEach(function(cm){
+            chainMoves.forEach(function(cm){
               var next=daGetMoves(b,cm.tr,cm.tc,true).filter(function(x){return x.cap;});
               if(next.length>bestScore){bestScore=next.length;best=cm;}
             });
           }
           daApplyMove(best);
         },400);
-        return;
       }
-      // Humain — sélectionner la pièce pour continuer
-      DA.selected={r:mv.tr,c:mv.tc};
-      DA.validMoves=chain;
-      updateDaStatus();
       return;
     }
+    // Chaîne terminée — réinitialiser proprement
+    DA.mustCapture=false;
   }
 
   // Vérifier fin de partie
@@ -9995,6 +9988,10 @@ function daApplyMove(mv){
   }
   if(!count1||!count2){daEndGame(!count1?2:1);return;}
 
+  // Réinitialiser sélection avant changement de tour
+  DA.selected=null;
+  DA.validMoves=[];
+  DA.mustCapture=false;
   // Changer de tour
   DA.turn=DA.turn===1?2:1;
   daCheckMustCapture();
@@ -11228,6 +11225,83 @@ function checkAdVisible(){
   btn.style.display = visible ? 'block' : 'none';
 }
 setInterval(checkAdVisible, 2000);
+
+// ── Bientôt disponible — 2v2 Online et Team Battle ──
+function showComingSoon(mode){
+  var names = {
+    '2v2-online': t('lbl_2v2online')||'2v2 Online',
+    'team-battle': t('lbl_teambattle')||'Team Battle Online'
+  };
+  var el = document.getElementById('cs-modal');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'cs-modal';
+    el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:500;'+
+      'display:flex;align-items:center;justify-content:center;flex-direction:column;';
+    el.innerHTML =
+      '<div style="background:#1a1a2e;border:2px solid rgba(255,215,0,.3);border-radius:20px;'+
+      'padding:32px 24px;text-align:center;max-width:300px;margin:16px">'+
+      '<div style="font-size:2.5rem;margin-bottom:12px">🚧</div>'+
+      '<div id="cs-mode-name" style="font-size:1.1rem;font-weight:900;color:#FFD700;margin-bottom:8px"></div>'+
+      '<div data-tr="coming_soon_msg" style="color:#8899AA;font-size:.9rem;margin-bottom:6px">'+t('coming_soon_msg')+'</div>'+
+      '<div style="color:#64B5F6;font-size:.8rem;margin-bottom:24px" data-tr="coming_soon_sub">'+t('coming_soon_sub')+'</div>'+
+      '<button id="cs-close-btn" style="background:rgba(255,215,0,.15);border:1px solid rgba(255,215,0,.4);color:#FFD700;'+
+      'padding:10px 28px;border-radius:12px;cursor:pointer;font-size:.95rem;font-weight:700" '+
+      'data-tr="btn_close">'+t('btn_close')+'</button>'+
+      '</div>';
+    document.body.appendChild(el);
+    var cb = document.getElementById('cs-close-btn');
+    if(cb) cb.onclick = function(){ document.getElementById('cs-modal').style.display='none'; };
+  }
+  var nameEl = document.getElementById('cs-mode-name');
+  if(nameEl) nameEl.textContent = names[mode]||mode;
+  el.style.display = 'flex';
+  applyTr();
+}
+
+// ── Bannière pub — empêcher ouverture si glissement ──
+(function(){
+  var _bannerSwipeX=0, _bannerSwipeY=0, _bannerMoved=false;
+  function watchBanners(){
+    // Chercher iframes et éléments pub en haut (Native Banner Adsterra)
+    var candidates = document.querySelectorAll('iframe, ins, [id*="adster"]');
+    candidates.forEach(function(el){
+      if(el._swipeWatched) return;
+      var rect = el.getBoundingClientRect();
+      if(rect.top > 200 || rect.height < 20) return;
+      el._swipeWatched = true;
+      var wrap = el.parentElement || el;
+      // Wrapper glissable
+      var sy=0, sx=0, moved=false;
+      wrap.addEventListener('touchstart',function(e){
+        sy=e.touches[0].clientY; sx=e.touches[0].clientX; moved=false;
+      },{passive:true});
+      wrap.addEventListener('touchmove',function(e){
+        var dy=Math.abs(e.touches[0].clientY-sy);
+        var dx=Math.abs(e.touches[0].clientX-sx);
+        if(dx>15||dy>15){ moved=true; }
+        if(moved){
+          var tdx=e.touches[0].clientX-sx;
+          wrap.style.transition='none';
+          wrap.style.transform='translateX('+tdx+'px)';
+        }
+      },{passive:true});
+      wrap.addEventListener('touchend',function(e){
+        wrap.style.transition='transform 0.3s ease';
+        var dx=e.changedTouches[0].clientX-sx;
+        if(Math.abs(dx)>70){
+          wrap.style.transform='translateX('+(dx>0?'120%':'-120%')+')';
+          setTimeout(function(){ wrap.style.transform='translateX(0)'; },9000);
+        } else {
+          wrap.style.transform='translateX(0)';
+        }
+      },{passive:true});
+    });
+  }
+  setTimeout(watchBanners,2000);
+  setTimeout(watchBanners,5000);
+  setTimeout(watchBanners,10000);
+})();
 </script>
 <!-- Modal master code pour affilies -->
 <div id="aff-mc-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);
