@@ -3216,6 +3216,7 @@ const TXT={
     coming_soon_msg:'Ce mode est en cours de développement.',
     coming_soon_sub:'Revenez bientôt — ça arrive !',
     btn_close:'Fermer',
+    your_turn_notif:'C\'est votre tour !',
     coming_soon:'🔜 BIENTÔT',
     // Boutons TAP
     tap_boost:'⚡ TAP TO BOOST',
@@ -3520,6 +3521,7 @@ const TXT={
     coming_soon_msg:'This mode is under development.',
     coming_soon_sub:'Check back soon — it\'s coming!',
     btn_close:'Close',
+    your_turn_notif:'Your turn!',
     coming_soon:'🔜 COMING SOON',
     tap_boost:'⚡ TAP TO BOOST',
     races_count:'RACES',watch_ad_btn:'WATCH AD +2 🪙',
@@ -3817,6 +3819,7 @@ const TXT={
     coming_soon_msg:'Este modo está en desarrollo.',
     coming_soon_sub:'¡Vuelve pronto — viene en camino!',
     btn_close:'Cerrar',
+    your_turn_notif:'¡Tu turno!',
     coming_soon:'🔜 PRÓXIMAMENTE',
     tap_boost:'⚡ TOCA PARA AVANZAR',
     races_count:'CARRERAS',watch_ad_btn:'VER ANUNCIO +2 🪙',
@@ -4110,6 +4113,7 @@ const TXT={
     coming_soon_msg:'هذا الوضع قيد التطوير.',
     coming_soon_sub:'عد قريباً — إنه قادم!',
     btn_close:'إغلاق',
+    your_turn_notif:'دورك!',
     coming_soon:'🔜 قريباً',
     tap_boost:'⚡ انقر للتعزيز',
     races_count:'سباقات',races_label:'سباقات',watch_ad_btn:'شاهد إعلاناً +2 🪙',
@@ -9448,6 +9452,9 @@ function updateMoStatus(){
   var player=MO.current==='X'?'❌':'⭕';
   if(MO.mode==='ai'){
     el.textContent=MO.current==='X'?t('damier_your_turn'):t('damier_ai_thinking');
+  } else if(MO.mode==='online'){
+    updateMoStatusOnline();
+    return;
   } else {
     el.textContent=player+' '+t('damier_your_turn');
   }
@@ -10504,6 +10511,8 @@ function updateMoStatusOnline(){
   var myTurn=(MO.current===MO.mySymbol);
   el.textContent=myTurn?('✋ '+t('damier_your_turn')):(MG_ONLINE.oppName+' ...');
   el.style.color=myTurn?'#FFD700':'#8899AA';
+  // Notifier quand c'est mon tour
+  if(myTurn) notifyMyTurn('morpion');
 }
 
 // Override moPlay for online mode
@@ -10631,6 +10640,8 @@ function updateDaStatusOnline(){
   var prefix=DA.mustCapture&&myTurn?'⚡ ':'';
   el.textContent=myTurn?(prefix+t('damier_your_turn')):(MG_ONLINE.oppName+' ...');
   el.style.color=myTurn?'#81C784':'#8899AA';
+  // Notifier quand c'est mon tour
+  if(myTurn) notifyMyTurn('damier');
 }
 
 function daClickOnline(c,r){
@@ -10968,6 +10979,11 @@ function updateGoStatus(){
   var isP1 = GO.turn === 1;
   if(GO.mode === 'ai'){
     el.textContent = isP1 ? t('damier_your_turn') : t('gomoku_ai_thinking');
+  } else if(GO.mode === 'online'){
+    var myTurn=(GO.turn===GO.myPlayer);
+    el.textContent = myTurn?('✋ '+t('damier_your_turn')):(MG_ONLINE.oppName+' ...');
+    el.style.color = myTurn?'#CE93D8':'#8899AA';
+    if(myTurn) notifyMyTurn('gomoku');
   } else {
     el.textContent = isP1 ? t('gomoku_p1_turn') : t('gomoku_p2_turn');
   }
@@ -11302,6 +11318,19 @@ function showComingSoon(mode){
   setTimeout(watchBanners,5000);
   setTimeout(watchBanners,10000);
 })();
+
+// ── Notification "C'est votre tour" ──
+var _lastTurnNotif = 0;
+function notifyMyTurn(gameName){
+  var now = Date.now();
+  if(now - _lastTurnNotif < 2000) return; // Éviter spam
+  _lastTurnNotif = now;
+  // Vibration
+  if(navigator.vibrate) navigator.vibrate([100,50,100]);
+  // Toast visible
+  var msg = '👆 ' + t('your_turn_notif');
+  toast(msg);
+}
 </script>
 <!-- Modal master code pour affilies -->
 <div id="aff-mc-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);
