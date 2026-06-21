@@ -51,7 +51,7 @@
 
 // ─── 1. ENREGISTRER LE SERVICE WORKER (fichier statique) ──
 // ── VERSION CHECK — force cache clear on update ──
-var NR_VERSION = '2.1.0';
+var NR_VERSION = '2.2.0';
 (function(){
   try{
     var saved = localStorage.getItem('nr_app_version');
@@ -2612,8 +2612,6 @@ function showRace(){
 }
 
 function G(id){
-  // Stop tetris when leaving tetris page
-  if(id!=='pg-tetris' && typeof tetPause==='function') tetPause();
   // Remettre display normal sur toutes les pages
   document.querySelectorAll('.pg').forEach(function(p){
     p.classList.remove('on');
