@@ -9378,8 +9378,8 @@ updateMenu=function(){
 // ═══════════════════════════════════════════════════════════
 // MINI-GAMES NAVIGATION
 // ═══════════════════════════════════════════════════════════
-function goMorpion(){tetrisPause();G('pg-morpion');syncMiniCoins();}
-function goGomoku(){tetrisPause();G('pg-gomoku');syncMiniCoins();}
+function goMorpion(){tetPause();G('pg-morpion');syncMiniCoins();}
+function goGomoku(){tetPause();G('pg-gomoku');syncMiniCoins();}
 
 // ── Compteur de parties mini-jeux — pub toutes les 2 parties ──
 var MG_GAME_CT = 0;
@@ -9401,7 +9401,7 @@ function mgCountGame(){
   }
 }
 function goTetris(){G('pg-tetris');tetStart();syncMiniCoins();}
-function goDamier(){tetrisPause();G('pg-damier');syncMiniCoins();}
+function goDamier(){tetPause();G('pg-damier');syncMiniCoins();}
 function syncMiniCoins(){
   var c=U?U.coins||0:0;
   var els=['mo-coins','tet-coins','da-coins'];
@@ -11425,7 +11425,7 @@ function notifyMyTurn(gameName){
 <!-- ══════════════════════════════════════════════════════ -->
 <div class="pg" id="pg-tetris" style="background:#0a0a1a">
   <div class="menu-header">
-    <button class="back-btn" onclick="G('pg-menu');tetrisPause()" style="background:none;border:none;color:#FF6E40;font-size:1.4rem;cursor:pointer;padding:4px 8px">‹</button>
+    <button class="back-btn" onclick="G('pg-menu');tetPause()" style="background:none;border:none;color:#FF6E40;font-size:1.4rem;cursor:pointer;padding:4px 8px">‹</button>
     <div class="logo" style="font-size:1.2rem;color:#FF6E40" data-tr="tetris_title">Tetris</div>
     <div style="display:flex;gap:8px;align-items:center">
       <div style="font-size:.75rem;color:#8899AA">Niv <span id="tet-level">1</span></div>
