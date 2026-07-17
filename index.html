@@ -10373,20 +10373,29 @@ function mgJoinRoom(game){
 
 async function mgSaveRoom(){
   try{
+    // Use EXACT same fields as working horse race room (all Supabase columns)
     var result = await sbFetch('nr_rooms?on_conflict=code',{
-      method:'POST',prefer:'resolution=merge-duplicates,return=minimal',
+      method:'POST', prefer:'resolution=merge-duplicates,return=minimal',
       body:{
-        code:MG_ONLINE.roomCode, type:'mg_'+MG_ONLINE.game,
-        host_email:U.email, host_name:MG_ONLINE.myName,
-        guest_email:null, guest_name:null,
-        status:'waiting', host_taps:0, guest_taps:0,
-        host_country:null, guest_country:null,
-        created_at:new Date().toISOString(), updated_at:new Date().toISOString()
+        code:MG_ONLINE.roomCode,
+        type:'mg_'+MG_ONLINE.game,
+        host_email:U.email,
+        host_name:MG_ONLINE.myName,
+        guest_email:null,
+        guest_name:null,
+        max_players:2,
+        players:'[]',
+        status:'waiting',
+        host_country:null,
+        guest_country:null,
+        host_taps:0,
+        guest_taps:0,
+        created_at:new Date().toISOString(),
+        updated_at:new Date().toISOString()
       }
     });
     return result;
   }catch(e){
-    console.log('mgSaveRoom error:', e);
     return null;
   }
 }
@@ -10401,11 +10410,15 @@ function mgStartHostPoll(){
   if(MG_ONLINE.pollId) clearInterval(MG_ONLINE.pollId);
   MG_ONLINE.pollId=setInterval(async function(){
     try{
-      var rows=await sbFetch('nr_rooms?code=eq.'+MG_ONLINE.roomCode+'&select=guest_email,guest_name,status&limit=1');
+      var rows=await sbFetch('nr_rooms?code=eq.'+MG_ONLINE.roomCode+'&select=guest_email,guest_name,status,players&limit=1');
       if(!rows||!rows[0]) return;
       var r=rows[0];
-      if(r.guest_email&&!MG_ONLINE.oppName){
-        MG_ONLINE.oppName=r.guest_name||r.guest_email;
+      // Check via guest_email or players list
+      var hasGuest = r.guest_email || (function(){
+        try{ var pl=JSON.parse(r.players||'[]'); return pl.length>=2; }catch(e){return false;}
+      })();
+      if(hasGuest&&!MG_ONLINE.oppName){
+        MG_ONLINE.oppName=r.guest_name||r.guest_email||'Invité';
         document.getElementById('mg-guest-name').textContent=MG_ONLINE.oppName;
         document.getElementById('mg-guest-joined').style.display='block';
         document.getElementById('mg-start-btn').style.display='block';
@@ -10442,9 +10455,18 @@ async function mgConfirmJoin(){
     MG_ONLINE.roomCode=code;
     MG_ONLINE.oppName=r.host_name||r.host_email;
     // Join the room
+    // Update room with guest info
+    var existingPlayers = [];
+    try{ existingPlayers = JSON.parse(r.players||'[]'); }catch(e){}
+    existingPlayers.push({email:U.email, name:MG_ONLINE.myName, slot:1});
     await sbFetch('nr_rooms?code=eq.'+code,{
       method:'PATCH',prefer:'return=minimal',
-      body:{guest_email:U.email,guest_name:MG_ONLINE.myName,updated_at:new Date().toISOString()}
+      body:{
+        guest_email:U.email,
+        guest_name:MG_ONLINE.myName,
+        players:JSON.stringify(existingPlayers),
+        updated_at:new Date().toISOString()
+      }
     });
     // Always trust room type — update game to match the room
     var detectedGame = (r.type&&r.type.startsWith('mg_'))?r.type.replace('mg_',''):MG_ONLINE.game;
