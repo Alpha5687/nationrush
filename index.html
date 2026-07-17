@@ -9795,7 +9795,8 @@ var DA={
   board:null, ctx:null, mode:'2p', turn:1,
   selected:null, validMoves:[], mustCapture:false,
   scores:{1:0,2:0}, active:false,
-  CELL:40, SIZE:8
+  CELL:40, SIZE:8,
+  lastWinner:null  // Winner goes first in next game
 };
 
 // Pièces: 0=vide, 1=j1 pion, 2=j2 pion, 11=j1 dame, 22=j2 dame
@@ -9902,7 +9903,9 @@ function daGetMoves(board,r,c,captureOnly){
 function startDamier(mode){
   DA.mode=mode;
   DA.board=daInitBoard();
-  DA.turn=1; DA.selected=null; DA.validMoves=[]; DA.active=true;
+  // Winner of last game goes first; first game: player 1 (white) starts
+  DA.turn=DA.lastWinner||1;
+  DA.selected=null; DA.validMoves=[]; DA.active=true;
   DA.scores={1:0,2:0};
   document.getElementById('da-setup').style.display='none';
   document.getElementById('da-game').style.display='block';
@@ -10170,6 +10173,7 @@ function updateDaStatus(){
 
 function daEndGame(winner){
   DA.active=false;
+  if(winner) DA.lastWinner=winner; // Track who won — goes first next game
   mgCountGame(); // Compteur pub toutes les 2 parties
   DA.scores[winner]=(DA.scores[winner]||0)+1;
   var iWon=(DA.mode==='ai'?winner===1:(winner===1));
@@ -10326,7 +10330,9 @@ function mgCreateRoom(game){
   MG_ONLINE.active=false;
   G('pg-mg-online');
   syncMiniCoins();
-  document.getElementById('mg-online-title').textContent=game==='morpion'?t('morpion_title'):game==='gomoku'?t('gomoku_title'):t('damier_title');
+  // Reset entire page before showing
+  var _mgNames={morpion:t('morpion_title'),gomoku:t('gomoku_title'),damier:t('damier_title')};
+  document.getElementById('mg-online-title').textContent=_mgNames[game]||game;
   document.getElementById('mg-host-view').style.display='block';
   document.getElementById('mg-guest-view').style.display='none';
   document.getElementById('mg-room-code-display').textContent=MG_ONLINE.roomCode;
@@ -10349,7 +10355,8 @@ function mgJoinRoom(game){
   MG_ONLINE.myName=U.name||U.email;
   G('pg-mg-online');
   syncMiniCoins();
-  document.getElementById('mg-online-title').textContent=game==='morpion'?t('morpion_title'):t('damier_title');
+  // Neutral title — will be updated after code is confirmed
+  document.getElementById('mg-online-title').textContent='🔗 Rejoindre';
   document.getElementById('mg-host-view').style.display='none';
   document.getElementById('mg-guest-view').style.display='block';
   document.getElementById('mg-join-input').value='';
@@ -10423,15 +10430,19 @@ async function mgConfirmJoin(){
       method:'PATCH',prefer:'return=minimal',
       body:{guest_email:U.email,guest_name:MG_ONLINE.myName,updated_at:new Date().toISOString()}
     });
-    // Verify game type matches where user came from
-    // If type doesn't match, still join but navigate to correct page
+    // Always trust room type — update game to match the room
     var detectedGame = (r.type&&r.type.startsWith('mg_'))?r.type.replace('mg_',''):MG_ONLINE.game;
     if(detectedGame !== MG_ONLINE.game){
-      // Game type mismatch — update to correct game
-      MG_ONLINE.game = detectedGame;
-      // Update the online room title
-      var titleEl = document.getElementById('mg-online-title');
-      if(titleEl) titleEl.textContent = detectedGame==='morpion'?t('morpion_title'):detectedGame==='gomoku'?t('gomoku_title'):t('damier_title');
+      // Room is for a different game — notify user
+      var names={morpion:t('morpion_title'),gomoku:t('gomoku_title'),damier:t('damier_title')};
+      toast('🔄 Room '+( names[detectedGame]||detectedGame)+' détectée!');
+    }
+    MG_ONLINE.game = detectedGame;
+    // Update title with CORRECT game name after code confirmed
+    var titleEl = document.getElementById('mg-online-title');
+    if(titleEl){
+      var gameName = detectedGame==='morpion'?t('morpion_title'):detectedGame==='gomoku'?t('gomoku_title'):t('damier_title');
+      titleEl.textContent = gameName;
     }
     document.getElementById('mg-join-status').textContent='✅ Rejoint ! En attente du lancement...';
     document.getElementById('mg-waiting-start').style.display='block';
@@ -11483,6 +11494,8 @@ var BT_MAP_THEMES=[
   {name:'Arctic',   wallColor:'#2a3a4a', floorColor:'#050810', accentColor:'#3a5a7a', gridColor:'rgba(100,181,246,.04)'},
   {name:'Volcano',  wallColor:'#3a1a0a', floorColor:'#0e0505', accentColor:'#8a2a0a', gridColor:'rgba(255,80,0,.04)'},
   {name:'City',     wallColor:'#252535', floorColor:'#0a0a12', accentColor:'#353555', gridColor:'rgba(150,150,255,.03)'},
+  {name:'Sewer',    wallColor:'#1a2a1a', floorColor:'#050a05', accentColor:'#2a4a2a', gridColor:'rgba(0,150,0,.04)'},
+  {name:'Space',    wallColor:'#0a0a2a', floorColor:'#020208', accentColor:'#1a1a4a', gridColor:'rgba(100,100,255,.05)'},
 ];
 var BT_CURRENT_THEME=0;
 
@@ -11528,6 +11541,38 @@ var BT_MAP_LAYOUTS=[
     {x:W*.2,y:H*.55,w:50,h:15},{x:W*.55,y:H*.55,w:50,h:15},
     {x:W*.38,y:H*.3,w:15,h:15},{x:W*.48,y:H*.3,w:15,h:15},
     {x:W*.43,y:H*.45,w:15,h:15},
+  ];},
+  // Layout 5: U-shaped bunkers
+  function(W,H){return [
+    // Left bunker (U shape)
+    {x:W*.05,y:H*.2,w:15,h:45},{x:W*.05,y:H*.2,w:45,h:15},
+    {x:W*.05,y:H*.5,w:45,h:15},
+    // Right bunker (inverted U)
+    {x:W*.72,y:H*.2,w:15,h:45},{x:W*.57,y:H*.2,w:30,h:15},
+    {x:W*.57,y:H*.5,w:30,h:15},
+    // Center obstacles
+    {x:W*.35,y:H*.15,w:15,h:30},{x:W*.5,y:H*.15,w:15,h:30},
+    {x:W*.3,y:H*.5,w:60,h:15},
+    {x:W*.42,y:H*.35,w:15,h:30},
+  ];},
+  // Layout 6: Maze corridors 90°
+  function(W,H){return [
+    {x:W*.1,y:H*.1,w:60,h:12},{x:W*.1,y:H*.1,w:12,h:55},
+    {x:W*.65,y:H*.1,w:60,h:12},{x:W*.65+48,y:H*.1,w:12,h:55},
+    {x:W*.28,y:H*.22,w:12,h:45},{x:W*.28,y:H*.55,w:55,h:12},
+    {x:W*.55,y:H*.22,w:12,h:45},{x:W*.15,y:H*.55,w:55,h:12},
+    {x:W*.38,y:H*.35,w:25,h:12},{x:W*.45,y:H*.35,w:12,h:30},
+  ];},
+  // Layout 7: Diagonal barriers (90° walls)
+  function(W,H){return [
+    // Staircase pattern left
+    {x:W*.05,y:H*.12,w:40,h:12},{x:W*.05,y:H*.12,w:12,h:30},
+    {x:W*.18,y:H*.3,w:40,h:12},{x:W*.18,y:H*.3,w:12,h:30},
+    {x:W*.31,y:H*.48,w:40,h:12},{x:W*.31,y:H*.48,w:12,h:30},
+    // Mirror right
+    {x:W*.55,y:H*.12,w:40,h:12},{x:W*.55+28,y:H*.12,w:12,h:30},
+    {x:W*.62,y:H*.3,w:40,h:12},{x:W*.62+28,y:H*.3,w:12,h:30},
+    {x:W*.45,y:H*.55,w:50,h:12},
   ];},
 ];
 
