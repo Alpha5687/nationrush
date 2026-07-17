@@ -1218,6 +1218,16 @@ body.rtl .rrow{flex-direction:row-reverse}
       </div>
       <div style="font-size:1.1rem;color:#8899AA">›</div>
     </div>
+    <div class="mc" style="background:rgba(255,50,50,.06);border-color:rgba(255,80,80,.3)" onclick="goBattle()">
+      <div class="mi">🔫</div>
+      <div style="flex:1">
+        <div class="mt2" style="color:#FF5252" data-tr="battle_title">Carida Battle</div>
+        <div class="md" data-tr="battle_desc">Tir • Abris • 1-5 joueurs</div>
+        <div class="ml" style="color:#00E676">✅ GRATUIT</div>
+      </div>
+      <div style="font-size:1.1rem;color:#8899AA">›</div>
+    </div>
+
     <div style="font-size:.8rem;letter-spacing:2px;color:#8899AA;margin:10px 0 5px;font-weight:700" data-tr="menu_social_section">👥 SOCIAL</div>
 
     <div class="mc" style="background:rgba(255,215,0,.04);border-color:rgba(255,215,0,.2)" onclick="G('pg-ref');loadRef()">
@@ -3215,6 +3225,12 @@ const TXT={
     coming_soon_sub:'Revenez bientôt — ça arrive !',
     btn_close:'Fermer',
     your_turn_notif:'C\'est votre tour !',
+    battle_title:'Carida Battle',battle_desc:'Tir • Abris • 1-5 joueurs',
+    battle_solo:'Solo vs IA',battle_coop:'Coopératif vs IA',battle_online:'Online PvP',
+    battle_level:'Niveau',battle_lives:'Vies',battle_score:'Score',
+    battle_win:'🏆 Victoire !',battle_lost:'💀 Défaite',battle_wave:'Vague',
+    battle_start:'▶ Lancer',battle_choose_mode:'CHOISIR LE MODE',
+    battle_players:'Joueurs',battle_bots:'Bots IA',
     coming_soon:'🔜 BIENTÔT',
     // Boutons TAP
     tap_boost:'⚡ TAP TO BOOST',
@@ -3520,6 +3536,12 @@ const TXT={
     coming_soon_sub:'Check back soon — it\'s coming!',
     btn_close:'Close',
     your_turn_notif:'Your turn!',
+    battle_title:'Carida Battle',battle_desc:'Shoot • Cover • 1-5 players',
+    battle_solo:'Solo vs AI',battle_coop:'Co-op vs AI',battle_online:'Online PvP',
+    battle_level:'Level',battle_lives:'Lives',battle_score:'Score',
+    battle_win:'🏆 Victory!',battle_lost:'💀 Defeat',battle_wave:'Wave',
+    battle_start:'▶ Start',battle_choose_mode:'CHOOSE MODE',
+    battle_players:'Players',battle_bots:'AI Bots',
     coming_soon:'🔜 COMING SOON',
     tap_boost:'⚡ TAP TO BOOST',
     races_count:'RACES',watch_ad_btn:'WATCH AD +2 🪙',
@@ -3818,6 +3840,12 @@ const TXT={
     coming_soon_sub:'¡Vuelve pronto — viene en camino!',
     btn_close:'Cerrar',
     your_turn_notif:'¡Tu turno!',
+    battle_title:'Carida Battle',battle_desc:'Disparo • Coberturas • 1-5 jugadores',
+    battle_solo:'Solo vs IA',battle_coop:'Cooperativo vs IA',battle_online:'Online PvP',
+    battle_level:'Nivel',battle_lives:'Vidas',battle_score:'Puntos',
+    battle_win:'🏆 ¡Victoria!',battle_lost:'💀 Derrota',battle_wave:'Oleada',
+    battle_start:'▶ Iniciar',battle_choose_mode:'ELEGIR MODO',
+    battle_players:'Jugadores',battle_bots:'Bots IA',
     coming_soon:'🔜 PRÓXIMAMENTE',
     tap_boost:'⚡ TOCA PARA AVANZAR',
     races_count:'CARRERAS',watch_ad_btn:'VER ANUNCIO +2 🪙',
@@ -4112,6 +4140,12 @@ const TXT={
     coming_soon_sub:'عد قريباً — إنه قادم!',
     btn_close:'إغلاق',
     your_turn_notif:'دورك!',
+    battle_title:'معركة كاريدا',battle_desc:'إطلاق نار • مخابئ • 1-5 لاعبين',
+    battle_solo:'فردي ضد الذكاء',battle_coop:'تعاوني ضد الذكاء',battle_online:'أونلاين',
+    battle_level:'المستوى',battle_lives:'الأرواح',battle_score:'النقاط',
+    battle_win:'🏆 فوز!',battle_lost:'💀 خسارة',battle_wave:'موجة',
+    battle_start:'▶ ابدأ',battle_choose_mode:'اختر النمط',
+    battle_players:'لاعبون',battle_bots:'روبوتات',
     coming_soon:'🔜 قريباً',
     tap_boost:'⚡ انقر للتعزيز',
     races_count:'سباقات',races_label:'سباقات',watch_ad_btn:'شاهد إعلاناً +2 🪙',
@@ -9409,12 +9443,13 @@ function syncMiniCoins(){
 // ═══════════════════════════════════════════════════════════
 // MORPION (TIC-TAC-TOE)
 // ═══════════════════════════════════════════════════════════
-var MO={board:Array(9).fill(null),current:'X',mode:'2p',scores:{X:0,O:0},active:false};
+var MO={board:Array(9).fill(null),current:'X',mode:'2p',scores:{X:0,O:0},active:false,lastWinner:null};
 
 function startMorpion(mode){
   MO.mode=mode;
   MO.board=Array(9).fill(null);
-  MO.current='X';
+  // Winner of last game starts — first game always X starts
+  MO.current=MO.lastWinner||'X';
   MO.active=true;
   document.getElementById('mo-setup').style.display='none';
   document.getElementById('mo-game').style.display='block';
@@ -9514,6 +9549,8 @@ function moEndGame(result){
   mgCountGame(); // Compteur pub toutes les 2 parties
   var won=(result!=='draw')&&(result===MO.current||(MO.mode==='ai'&&result==='X'));
   var isDraw=result==='draw';
+  // Track who won — they go first next game
+  if(!isDraw) MO.lastWinner=result; // 'X' or 'O'
   var coins=0;
   if(won){coins=10;MO.scores[result]=(MO.scores[result]||0)+1;}
   else if(isDraw){coins=2;MO.scores.X++;MO.scores.O++;}
@@ -10375,8 +10412,10 @@ async function mgConfirmJoin(){
     var r=rows[0];
     if(r.status!=='waiting'){document.getElementById('mg-join-status').textContent='❌ Room déjà en cours';return;}
     if(r.guest_email){document.getElementById('mg-join-status').textContent='❌ Room déjà complète';return;}
-    // Detect game type from room
-    if(r.type&&r.type.startsWith('mg_')) MG_ONLINE.game=r.type.replace('mg_','');
+    // Detect game type from room — always trust the room type
+    if(r.type&&r.type.startsWith('mg_')){
+      MG_ONLINE.game=r.type.replace('mg_','');
+    }
     MG_ONLINE.roomCode=code;
     MG_ONLINE.oppName=r.host_name||r.host_email;
     // Join the room
@@ -10384,6 +10423,16 @@ async function mgConfirmJoin(){
       method:'PATCH',prefer:'return=minimal',
       body:{guest_email:U.email,guest_name:MG_ONLINE.myName,updated_at:new Date().toISOString()}
     });
+    // Verify game type matches where user came from
+    // If type doesn't match, still join but navigate to correct page
+    var detectedGame = (r.type&&r.type.startsWith('mg_'))?r.type.replace('mg_',''):MG_ONLINE.game;
+    if(detectedGame !== MG_ONLINE.game){
+      // Game type mismatch — update to correct game
+      MG_ONLINE.game = detectedGame;
+      // Update the online room title
+      var titleEl = document.getElementById('mg-online-title');
+      if(titleEl) titleEl.textContent = detectedGame==='morpion'?t('morpion_title'):detectedGame==='gomoku'?t('gomoku_title'):t('damier_title');
+    }
     document.getElementById('mg-join-status').textContent='✅ Rejoint ! En attente du lancement...';
     document.getElementById('mg-waiting-start').style.display='block';
     // Deduct coins
@@ -10425,6 +10474,10 @@ async function mgStartGame(){
 // ── LAUNCH THE ACTUAL GAME ──
 function mgLaunchGame(){
   MG_ONLINE.active=true;
+  // Navigate to the correct game page FIRST
+  if(MG_ONLINE.game==='morpion') G('pg-morpion');
+  else if(MG_ONLINE.game==='gomoku') G('pg-gomoku');
+  else if(MG_ONLINE.game==='damier') G('pg-damier');
   mgInitChannel();
   if(MG_ONLINE.game==='morpion'){
     mgLaunchMorpion();
@@ -10489,12 +10542,12 @@ function mgSendMove(moveData){
 
 // ═══ MORPION ONLINE ═══
 function mgLaunchMorpion(){
-  // Host=X goes first, Guest=O
+  // Host=X, Guest=O — winner goes first (or X on first game)
   MO.board=Array(9).fill(null);
-  MO.scores={X:0,O:0};
   MO.mode='online';
   MO.mySymbol=MG_ONLINE.role==='host'?'X':'O';
-  MO.current='X'; // X always goes first
+  // Winner of last game starts; first game: X starts
+  MO.current=MO.lastWinner||'X';
   MO.active=true;
   document.getElementById('mo-setup').style.display='none';
   document.getElementById('mo-game').style.display='block';
@@ -11329,6 +11382,986 @@ function notifyMyTurn(gameName){
   var msg = '👆 ' + t('your_turn_notif');
   toast(msg);
 }
+
+// ═══════════════════════════════════════════════════════════
+// CARIDA BATTLE — Top-down shooter
+// Solo vs IA, Coop vs IA, jusqu'à 5 joueurs
+// ═══════════════════════════════════════════════════════════
+var BT = {
+  canvas:null, ctx:null, mode:'solo', level:1,
+  running:false, paused:false, loop:null,
+  W:0, H:0, CELL:40,
+  players:[], bullets:[], enemies:[], walls:[],
+  wave:1, score:0, gameOver:false,
+  joystick:{active:false,dx:0,dy:0,startX:0,startY:0},
+  fireActive:false, fireTimer:null
+};
+
+// Constants per level
+function btLevelConfig(lv){
+  return {
+    enemySpeed: 1.2 + lv*0.5,
+    enemyHP: 1 + Math.floor(lv/2),
+    enemyShoot: lv >= 3,
+    enemyShootRate: Math.max(60, 180 - lv*20),
+    waveSize: 3 + lv*2,
+    playerSpeed: 5.5,       // Beaucoup plus rapide
+    bulletSpeed: 9,          // Balles plus rapides
+    lives: Math.max(1, 4 - Math.floor(lv/2))
+  };
+}
+
+// Navigation
+function goBattle(){ tetPause(); G('pg-battle'); syncMiniCoins(); btSetLevel(1); }
+function battleExit(){
+  btStop();
+  document.getElementById('bt-setup').style.display='block';
+  document.getElementById('bt-game').style.display='none';
+  document.getElementById('bt-result').style.display='none';
+  G('pg-menu');
+}
+
+function btSetLevel(lv){
+  BT.level=lv;
+  document.querySelectorAll('.btlv-btn').forEach(function(b,i){
+    var isActive = (i+1)===lv;
+    b.style.background = isActive?'rgba(255,82,82,.25)':'transparent';
+    b.style.borderColor = isActive?'#FF5252':'#333';
+    b.style.color = isActive?'#FF5252':'#666';
+    b.style.borderWidth = isActive?'2px':'1px';
+  });
+}
+
+function btStartMode(mode){
+  BT.mode=mode;
+  document.getElementById('bt-setup').style.display='none';
+  document.getElementById('bt-game').style.display='block';
+  document.getElementById('bt-result').style.display='none';
+  btInit();
+}
+
+function btInit(){
+  var canvas=document.getElementById('bt-canvas');
+  BT.canvas=canvas;
+  // Fit screen
+  var maxW=Math.min(window.innerWidth, 420);
+  BT.W=maxW; BT.H=Math.min(window.innerHeight*0.55, 320);
+  canvas.width=BT.W; canvas.height=BT.H;
+  BT.ctx=canvas.getContext('2d');
+  BT.score=0; BT.wave=1; BT.gameOver=false; BT.paused=false;
+
+  var cfg=btLevelConfig(BT.level);
+
+  // Create player(s)
+  BT.players=[];
+  var numPlayers = BT.mode==='coop'?2:1;
+  var startPositions=[[BT.W/2,BT.H-60],[BT.W/3,BT.H-60],[2*BT.W/3,BT.H-60]];
+  for(var i=0;i<numPlayers;i++){
+    BT.players.push({
+      x:startPositions[i][0], y:startPositions[i][1],
+      w:20, h:20, hp:cfg.lives, maxHp:cfg.lives,
+      color:['#00E676','#64B5F6'][i],
+      dx:0, dy:0, angle:0, isAI:i>0,
+      fireCD:0, alive:true, id:i
+    });
+  }
+  BT.bullets=[]; BT.enemies=[];
+  btGenerateWalls();
+  btSpawnWave(1, cfg);
+  btSetupControls();
+  btUpdateHUD();
+  if(BT.loop) clearInterval(BT.loop);
+  BT.running=true;
+  BT.loop=setInterval(btTick, 33); // ~30fps
+}
+
+// Map themes — change appearance and layout each game
+var BT_MAP_THEMES=[
+  {name:'Bunker',   wallColor:'#2a2a3a', floorColor:'#0d0d0d', accentColor:'#3a3a5a', gridColor:'rgba(255,255,255,.04)'},
+  {name:'Jungle',   wallColor:'#1a3a1a', floorColor:'#050e05', accentColor:'#2a5a2a', gridColor:'rgba(0,255,100,.03)'},
+  {name:'Desert',   wallColor:'#3a2a1a', floorColor:'#0e0905', accentColor:'#5a4a2a', gridColor:'rgba(255,180,50,.03)'},
+  {name:'Arctic',   wallColor:'#2a3a4a', floorColor:'#050810', accentColor:'#3a5a7a', gridColor:'rgba(100,181,246,.04)'},
+  {name:'Volcano',  wallColor:'#3a1a0a', floorColor:'#0e0505', accentColor:'#8a2a0a', gridColor:'rgba(255,80,0,.04)'},
+  {name:'City',     wallColor:'#252535', floorColor:'#0a0a12', accentColor:'#353555', gridColor:'rgba(150,150,255,.03)'},
+];
+var BT_CURRENT_THEME=0;
+
+// Map layouts — different shapes each game
+var BT_MAP_LAYOUTS=[
+  // Layout 0: Classic corridors
+  function(W,H){return [
+    {x:W*.15,y:H*.15,w:60,h:15},{x:W*.55,y:H*.15,w:60,h:15},
+    {x:W*.05,y:H*.38,w:15,h:50},{x:W*.8,y:H*.38,w:15,h:50},
+    {x:W*.3,y:H*.28,w:15,h:60},{x:W*.6,y:H*.28,w:15,h:60},
+    {x:W*.15,y:H*.6,w:80,h:15},{x:W*.55,y:H*.6,w:80,h:15},
+    {x:W*.38,y:H*.48,w:60,h:15},
+  ];},
+  // Layout 1: L-shaped covers
+  function(W,H){return [
+    {x:W*.1,y:H*.1,w:50,h:15},{x:W*.1,y:H*.1,w:15,h:50},
+    {x:W*.7,y:H*.1,w:50,h:15},{x:W*.75+35,y:H*.1,w:15,h:50},
+    {x:W*.35,y:H*.3,w:15,h:40},{x:W*.35,y:H*.3,w:60,h:15},
+    {x:W*.1,y:H*.55,w:60,h:15},{x:W*.1,y:H*.4,w:15,h:60},
+    {x:W*.7,y:H*.4,w:15,h:60},{x:W*.55,y:H*.55,w:60,h:15},
+    {x:W*.4,y:H*.62,w:50,h:15},
+  ];},
+  // Layout 2: Cross/T shapes
+  function(W,H){return [
+    {x:W*.35,y:H*.12,w:15,h:40},{x:W*.2,y:H*.28,w:60,h:15},
+    {x:W*.6,y:H*.12,w:15,h:40},{x:W*.55,y:H*.28,w:60,h:15},
+    {x:W*.1,y:H*.45,w:80,h:15},{x:W*.3,y:H*.35,w:15,h:60},
+    {x:W*.65,y:H*.45,w:80,h:15},{x:W*.6,y:H*.35,w:15,h:60},
+    {x:W*.38,y:H*.55,w:60,h:15},{x:W*.45,y:H*.42,w:15,h:50},
+  ];},
+  // Layout 3: Zigzag
+  function(W,H){return [
+    {x:W*.05,y:H*.2,w:80,h:12},{x:W*.45,y:H*.2,w:12,h:40},
+    {x:W*.6,y:H*.35,w:80,h:12},{x:W*.3,y:H*.35,w:12,h:40},
+    {x:W*.05,y:H*.5,w:80,h:12},{x:W*.45,y:H*.5,w:12,h:35},
+    {x:W*.6,y:H*.6,w:80,h:12},{x:W*.2,y:H*.6,w:12,h:40},
+    {x:W*.35,y:H*.15,w:50,h:12},
+  ];},
+  // Layout 4: Open center with side covers
+  function(W,H){return [
+    {x:W*.05,y:H*.15,w:15,h:80},{x:W*.8,y:H*.15,w:15,h:80},
+    {x:W*.2,y:H*.1,w:50,h:15},{x:W*.55,y:H*.1,w:50,h:15},
+    {x:W*.2,y:H*.55,w:50,h:15},{x:W*.55,y:H*.55,w:50,h:15},
+    {x:W*.38,y:H*.3,w:15,h:15},{x:W*.48,y:H*.3,w:15,h:15},
+    {x:W*.43,y:H*.45,w:15,h:15},
+  ];},
+];
+
+function btGenerateWalls(){
+  BT.walls=[];
+  var W=BT.W, H=BT.H;
+  // Pick random layout each game
+  var layoutIdx=Math.floor(Math.random()*BT_MAP_LAYOUTS.length);
+  BT._layoutIdx=layoutIdx;
+  var themeIdx=Math.floor(Math.random()*BT_MAP_THEMES.length);
+  BT._themeIdx=themeIdx;
+  BT_CURRENT_THEME=themeIdx;
+  // Generate walls from layout
+  var walls=BT_MAP_LAYOUTS[layoutIdx](W,H);
+  walls.forEach(function(w){
+    if(w.x>0&&w.y>0&&w.x+w.w<W&&w.y+w.h<H-30){
+      BT.walls.push(w);
+    }
+  });
+}
+
+function btSpawnWave(wave, cfg){
+  BT.enemies=[];
+  var count=cfg.waveSize + Math.floor((wave-1)*1.5);
+  for(var i=0;i<count;i++){
+    var side=Math.floor(Math.random()*3); // 0=top, 1=left, 2=right
+    var ex,ey;
+    if(side===0){ex=Math.random()*BT.W;ey=0;}
+    else if(side===1){ex=0;ey=Math.random()*(BT.H*0.6);}
+    else{ex=BT.W;ey=Math.random()*(BT.H*0.6);}
+    BT.enemies.push({
+      x:ex, y:ey, w:18, h:18,
+      hp:cfg.enemyHP, maxHp:cfg.enemyHP,
+      speed:cfg.enemySpeed+(Math.random()*0.3),
+      color:'#FF5252', alive:true,
+      fireCD:Math.floor(Math.random()*cfg.enemyShootRate),
+      shootRate:cfg.enemyShootRate,
+      canShoot:cfg.enemyShoot,
+      angle:0, type:wave>3&&i%3===0?'heavy':'normal'
+    });
+  }
+  // Show wave banner
+  var banner=document.getElementById('bt-wave-banner');
+  banner.textContent='⚔️ Vague '+wave;
+  banner.style.display='block';
+  setTimeout(function(){ banner.style.display='none'; },1500);
+  btUpdateHUD();
+}
+
+function btTick(){
+  if(!BT.running||BT.paused) return;
+  var cfg=btLevelConfig(BT.level);
+
+  // Move players
+  BT.players.forEach(function(p){
+    if(!p.alive) return;
+    var spd=cfg.playerSpeed;
+    if(p.isAI){
+      btAIPlayer(p, cfg);
+    } else {
+      p.x+=BT.joystick.dx*spd;
+      p.y+=BT.joystick.dy*spd;
+    }
+    // Clamp to canvas
+    p.x=Math.max(p.w/2,Math.min(BT.W-p.w/2,p.x));
+    p.y=Math.max(p.h/2,Math.min(BT.H-p.h/2,p.y));
+    // Wall collision
+    btWallCollide(p);
+    // Fire
+    if(!p.isAI && BT.fireActive && p.fireCD<=0){
+      btFireBullet(p,false);
+      p.fireCD=8;  // Tir plus rapide
+    }
+    if(p.fireCD>0) p.fireCD--;
+  });
+
+  // Move enemies
+  BT.enemies.forEach(function(e){
+    if(!e.alive) return;
+    // Find nearest player
+    var target=btNearestPlayer(e);
+    if(!target) return;
+    var dx=target.x-e.x, dy=target.y-e.y;
+    var dist=Math.sqrt(dx*dx+dy*dy)||1;
+    e.angle=Math.atan2(dy,dx);
+    // Move toward player (but avoid walls)
+    var nx=e.x+dx/dist*e.speed;
+    var ny=e.y+dy/dist*e.speed;
+    // Simple wall avoidance
+    var blocked=false;
+    BT.walls.forEach(function(w){
+      if(btRectOverlap({x:nx-e.w/2,y:ny-e.h/2,w:e.w,h:e.h},w)) blocked=true;
+    });
+    if(!blocked){e.x=nx;e.y=ny;}
+    else{
+      // Try moving only X or only Y
+      var bx=false,by=false;
+      BT.walls.forEach(function(w){
+        if(btRectOverlap({x:nx-e.w/2,y:e.y-e.h/2,w:e.w,h:e.h},w)) bx=true;
+        if(btRectOverlap({x:e.x-e.w/2,y:ny-e.h/2,w:e.w,h:e.h},w)) by=true;
+      });
+      if(!bx) e.x=nx;
+      if(!by) e.y=ny;
+    }
+    e.x=Math.max(0,Math.min(BT.W,e.x));
+    e.y=Math.max(0,Math.min(BT.H,e.y));
+    // Shoot
+    if(e.canShoot){
+      e.fireCD--;
+      if(e.fireCD<=0 && dist<BT.W*0.6){
+        btFireBullet(e,true);
+        e.fireCD=e.shootRate;
+      }
+    }
+    // Melee damage
+    BT.players.forEach(function(p){
+      if(!p.alive) return;
+      if(Math.abs(e.x-p.x)<16 && Math.abs(e.y-p.y)<16){
+        p.hp--;
+        e.x+=(-dx/dist)*20;e.y+=(-dy/dist)*20;
+        if(p.hp<=0){ p.alive=false; }
+      }
+    });
+  });
+
+  // Move bullets
+  BT.bullets=BT.bullets.filter(function(b){
+    b.x+=Math.cos(b.angle)*b.spd;
+    b.y+=Math.sin(b.angle)*b.spd;
+    if(b.x<0||b.x>BT.W||b.y<0||b.y>BT.H) return false;
+    // Wall collision
+    var hitWall=false;
+    BT.walls.forEach(function(w){
+      if(b.x>w.x&&b.x<w.x+w.w&&b.y>w.y&&b.y<w.y+w.h) hitWall=true;
+    });
+    if(hitWall) return false;
+    if(b.isEnemy){
+      // Hit player
+      BT.players.forEach(function(p){
+        if(!p.alive) return;
+        if(Math.abs(b.x-p.x)<12&&Math.abs(b.y-p.y)<12){
+          p.hp--; b.dead=true;
+          if(p.hp<=0) p.alive=false;
+        }
+      });
+    } else {
+      // Hit enemy
+      BT.enemies.forEach(function(e){
+        if(!e.alive) return;
+        if(Math.abs(b.x-e.x)<12&&Math.abs(b.y-e.y)<12){
+          e.hp--; b.dead=true;
+          if(e.hp<=0){
+            e.alive=false;
+            BT.score+=10*BT.level;
+          }
+        }
+      });
+    }
+    return !b.dead;
+  });
+
+  // Check wave clear
+  if(BT.enemies.every(function(e){return !e.alive;})){
+    BT.wave++;
+    var newCfg=btLevelConfig(BT.level);
+    setTimeout(function(){
+      if(BT.running) btSpawnWave(BT.wave, newCfg);
+    },1500);
+  }
+
+  // Check player all dead
+  if(BT.players.every(function(p){return !p.alive;})){
+    btEndGame(false);
+    return;
+  }
+
+  btUpdateHUD();
+  btDraw();
+}
+
+function btAIPlayer(p, cfg){
+  // AI teammate: find nearest enemy and move toward it, fire
+  var nearEnemy=null, minD=9999;
+  BT.enemies.forEach(function(e){
+    if(!e.alive) return;
+    var d=Math.hypot(e.x-p.x,e.y-p.y);
+    if(d<minD){minD=d;nearEnemy=e;}
+  });
+  if(nearEnemy){
+    var dx=nearEnemy.x-p.x, dy=nearEnemy.y-p.y;
+    var dist=Math.sqrt(dx*dx+dy*dy)||1;
+    p.angle=Math.atan2(dy,dx);
+    // Keep some distance
+    if(dist>80){
+      p.x+=dx/dist*cfg.playerSpeed*0.7;
+      p.y+=dy/dist*cfg.playerSpeed*0.7;
+    }
+    // Fire
+    if(p.fireCD<=0 && dist<200){
+      btFireBullet(p,false);
+      p.fireCD=25;
+    }
+  }
+  if(p.fireCD>0) p.fireCD--;
+}
+
+function btFireBullet(entity, isEnemy){
+  var angle=entity.angle||0;
+  if(!isEnemy){
+    // Aim toward nearest enemy
+    var near=btNearestEnemy(entity);
+    if(near) angle=Math.atan2(near.y-entity.y,near.x-entity.x);
+  }
+  BT.bullets.push({
+    x:entity.x, y:entity.y,
+    angle:angle, spd:5,
+    isEnemy:isEnemy, dead:false,
+    color:isEnemy?'#FF5252':'#FFD700'
+  });
+}
+
+function btNearestPlayer(enemy){
+  var nearest=null, minD=9999;
+  BT.players.forEach(function(p){
+    if(!p.alive) return;
+    var d=Math.hypot(p.x-enemy.x,p.y-enemy.y);
+    if(d<minD){minD=d;nearest=p;}
+  });
+  return nearest;
+}
+
+function btNearestEnemy(player){
+  var nearest=null, minD=9999;
+  BT.enemies.forEach(function(e){
+    if(!e.alive) return;
+    var d=Math.hypot(e.x-player.x,e.y-player.y);
+    if(d<minD){minD=d;nearest=e;}
+  });
+  return nearest;
+}
+
+function btRectOverlap(a,b){
+  return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
+}
+
+function btWallCollide(entity){
+  BT.walls.forEach(function(w){
+    var ex=entity.x-entity.w/2,ey=entity.y-entity.h/2;
+    if(btRectOverlap({x:ex,y:ey,w:entity.w,h:entity.h},w)){
+      // Push out
+      var ox=entity.x-(w.x+w.w/2), oy=entity.y-(w.y+w.h/2);
+      if(Math.abs(ox)>Math.abs(oy)) entity.x+=ox>0?2:-2;
+      else entity.y+=oy>0?2:-2;
+    }
+  });
+}
+
+function btDraw(){
+  var ctx=BT.ctx; if(!ctx) return;
+  var W=BT.W, H=BT.H;
+
+  var theme=BT_MAP_THEMES[BT._themeIdx||0];
+  // Background
+  ctx.fillStyle=theme.floorColor;
+  ctx.fillRect(0,0,W,H);
+
+  // Grid
+  ctx.strokeStyle=theme.gridColor;
+  ctx.lineWidth=1;
+  for(var x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(var y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  // Walls
+  BT.walls.forEach(function(w){
+    ctx.fillStyle=theme.wallColor;
+    ctx.fillRect(w.x,w.y,w.w,w.h);
+    ctx.strokeStyle=theme.accentColor;
+    ctx.lineWidth=2;
+    ctx.strokeRect(w.x,w.y,w.w,w.h);
+    // Top highlight
+    ctx.fillStyle='rgba(255,255,255,.1)';
+    ctx.fillRect(w.x,w.y,w.w,Math.min(4,w.h));
+    // Bottom shadow
+    ctx.fillStyle='rgba(0,0,0,.3)';
+    ctx.fillRect(w.x,w.y+w.h-2,w.w,2);
+  });
+
+  // Enemies
+  BT.enemies.forEach(function(e){
+    if(!e.alive) return;
+    ctx.save();
+    ctx.translate(e.x,e.y);
+    ctx.rotate(e.angle);
+    // Body
+    ctx.fillStyle=e.type==='heavy'?'#FF1744':'#FF5252';
+    ctx.beginPath();
+    ctx.arc(0,0,e.w/2,0,Math.PI*2);
+    ctx.fill();
+    // Gun barrel
+    ctx.fillStyle='#CC0000';
+    ctx.fillRect(0,-3,12,6);
+    // HP bar
+    ctx.restore();
+    if(e.maxHp>1){
+      ctx.fillStyle='#333';
+      ctx.fillRect(e.x-12,e.y-16,24,4);
+      ctx.fillStyle='#FF5252';
+      ctx.fillRect(e.x-12,e.y-16,24*(e.hp/e.maxHp),4);
+    }
+  });
+
+  // Players
+  BT.players.forEach(function(p){
+    if(!p.alive) return;
+    ctx.save();
+    ctx.translate(p.x,p.y);
+    // Find angle toward nearest enemy
+    var ne=btNearestEnemy(p);
+    if(ne) p.angle=Math.atan2(ne.y-p.y,ne.x-p.x);
+    ctx.rotate(p.angle);
+    // Body
+    ctx.fillStyle=p.color;
+    ctx.beginPath();
+    ctx.arc(0,0,10,0,Math.PI*2);
+    ctx.fill();
+    // Gun
+    ctx.fillStyle=p.isAI?'#1565C0':'#1B5E20';
+    ctx.fillRect(0,-3,14,6);
+    ctx.restore();
+    // HP hearts
+    for(var h=0;h<p.maxHp;h++){
+      ctx.fillStyle=h<p.hp?p.color:'#333';
+      ctx.fillText(h<p.hp?'❤':'🖤',p.x-p.maxHp*6+h*13,p.y-18);
+    }
+  });
+
+  // Bullets
+  BT.bullets.forEach(function(b){
+    ctx.beginPath();
+    ctx.arc(b.x,b.y,4,0,Math.PI*2);
+    ctx.fillStyle=b.color;
+    ctx.fill();
+    // Trail
+    ctx.beginPath();
+    ctx.arc(b.x-Math.cos(b.angle)*6,b.y-Math.sin(b.angle)*6,2,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,220,50,.4)';
+    ctx.fill();
+  });
+}
+
+function btUpdateHUD(){
+  var alive=BT.players.filter(function(p){return p.alive;});
+  var hp=alive.length>0?alive[0].hp:0;
+  var enemiesLeft=BT.enemies.filter(function(e){return e.alive;}).length;
+  var el=document.getElementById('bt-lives'); if(el) el.textContent=hp;
+  var es=document.getElementById('bt-score'); if(es) es.textContent=BT.score;
+  var elv=document.getElementById('bt-level'); if(elv) elv.textContent=BT.level;
+  var wn=document.getElementById('bt-wave-num'); if(wn) wn.textContent='Vague '+BT.wave;
+  var en=document.getElementById('bt-enemies-left'); if(en) en.textContent=enemiesLeft+' ennemis';
+}
+
+function btEndGame(won){
+  BT.running=false;
+  if(BT.loop){clearInterval(BT.loop);BT.loop=null;}
+  var coins=won?20:Math.floor(BT.score/20);
+  if(coins>0&&U){addCoins(coins);syncMiniCoins();}
+  mgCountGame(); // Ad counter
+  var el=document.getElementById('bt-result');
+  el.style.display='flex';
+  document.getElementById('bt-result-icon').textContent=won?'🏆':'💀';
+  document.getElementById('bt-result-text').textContent=won?t('battle_win'):t('battle_lost');
+  document.getElementById('bt-result-wave').textContent='Vague '+BT.wave+' • Score: '+BT.score;
+  document.getElementById('bt-result-coins').textContent=coins>0?'+'+coins+' 🪙':'';
+}
+
+function btStop(){
+  BT.running=false;
+  if(BT.loop){clearInterval(BT.loop);BT.loop=null;}
+}
+
+function btRestart(){
+  document.getElementById('bt-result').style.display='none';
+  btInit();
+}
+
+function btTogglePause(){
+  BT.paused=!BT.paused;
+}
+
+// ── Touch Controls ──
+function btSetupControls(){
+  var joyArea=document.getElementById('bt-joystick-area');
+  var knob=document.getElementById('bt-joystick-knob');
+  if(!joyArea) return;
+
+  joyArea.ontouchstart=function(e){
+    e.preventDefault();
+    var t=e.touches[0];
+    var r=joyArea.getBoundingClientRect();
+    BT.joystick.startX=r.left+r.width/2;
+    BT.joystick.startY=r.top+r.height/2;
+    BT.joystick.active=true;
+  };
+  joyArea.ontouchmove=function(e){
+    e.preventDefault();
+    if(!BT.joystick.active) return;
+    var t=e.touches[0];
+    var dx=t.clientX-BT.joystick.startX;
+    var dy=t.clientY-BT.joystick.startY;
+    var dist=Math.sqrt(dx*dx+dy*dy)||1;
+    var maxD=40;
+    var cd=Math.min(dist,maxD);
+    BT.joystick.dx=dx/dist;
+    BT.joystick.dy=dy/dist;
+    if(knob){
+      knob.style.transform='translate(calc(-50% + '+((dx/dist)*cd)+'px), calc(-50% + '+((dy/dist)*cd)+'px))';
+    }
+  };
+  joyArea.ontouchend=function(){
+    BT.joystick.active=false;
+    BT.joystick.dx=0;BT.joystick.dy=0;
+    if(knob) knob.style.transform='translate(-50%,-50%)';
+  };
+}
+
+function btFireStart(e){ e.preventDefault(); BT.fireActive=true; }
+function btFireEnd(e){ e.preventDefault(); BT.fireActive=false; }
+
+// ═══════════════════════════════════════════════════════════
+// CARIDA BATTLE — ONLINE SYSTEM
+// Jusqu'à 5 joueurs, modes PvP / Coop vs IA / Team vs IA
+// ═══════════════════════════════════════════════════════════
+var BT_ONLINE = {
+  numPlayers: 2,
+  mode: 'pvp',       // 'pvp' | 'coop_ai' | 'team_ai'
+  roomCode: null,
+  role: null,        // 'host' | 'guest'
+  channel: null,
+  pollId: null,
+  players: [],       // [{email, name, ready, slot}]
+  mySlot: -1,
+  cost: 15
+};
+
+function btShowOnlineSetup(){
+  if(!U){toast(t('toast_please_login'));G('pg-login');return;}
+  var el=document.getElementById('bt-online-setup');
+  if(el) el.style.display='flex';
+  btSetOnlinePlayers(2);
+  btSetOnlineMode('pvp');
+  document.getElementById('bton-waiting').style.display='none';
+  document.getElementById('bton-join-code').value='';
+}
+
+function btCloseOnlineSetup(){
+  var el=document.getElementById('bt-online-setup');
+  if(el) el.style.display='none';
+  if(BT_ONLINE.pollId){clearInterval(BT_ONLINE.pollId);BT_ONLINE.pollId=null;}
+  btOnlineCloseChannel();
+  if(BT_ONLINE.roomCode){
+    sbFetch('nr_rooms?code=eq.'+BT_ONLINE.roomCode,{method:'DELETE',prefer:'return=minimal'}).catch(function(){});
+    BT_ONLINE.roomCode=null;
+  }
+}
+
+function btSetOnlinePlayers(n){
+  BT_ONLINE.numPlayers=n;
+  [2,3,4,5].forEach(function(i){
+    var btn=document.getElementById('bton-p'+i);
+    if(!btn) return;
+    var active=(i===n);
+    btn.style.background=active?'rgba(100,181,246,.2)':'transparent';
+    btn.style.borderColor=active?'#64B5F6':'#333';
+    btn.style.borderWidth=active?'2px':'1px';
+    btn.style.color=active?'#64B5F6':'#666';
+  });
+}
+
+function btSetOnlineMode(mode){
+  BT_ONLINE.mode=mode;
+  var modes=['pvp','coop_ai','team_ai'];
+  var ids=['bton-pvp','bton-coop','bton-team'];
+  var colors=['#FF5252','#00E676','#64B5F6'];
+  modes.forEach(function(m,i){
+    var btn=document.getElementById(ids[i]);
+    if(!btn) return;
+    var active=(m===mode);
+    btn.style.background=active?'rgba('+['255,82,82','0,230,118','100,181,246'][i]+',.15)':'transparent';
+    btn.style.borderColor=active?colors[i]:'#333';
+    btn.style.borderWidth=active?'2px':'1px';
+    btn.style.color=active?colors[i]:'#666';
+  });
+}
+
+async function btOnlineCreate(){
+  if(!U){toast(t('toast_please_login'));return;}
+  if(!isAdmin()&&(U.coins||0)<BT_ONLINE.cost){toast(t('toast_not_enough_coins'));return;}
+  BT_ONLINE.role='host';
+  BT_ONLINE.roomCode=generateRoomCode();
+  BT_ONLINE.mySlot=0;
+  BT_ONLINE.players=[{email:U.email,name:U.name||U.email,slot:0,ready:true}];
+  try{
+    await sbFetch('nr_rooms?on_conflict=code',{
+      method:'POST',prefer:'resolution=merge-duplicates,return=minimal',
+      body:{
+        code:BT_ONLINE.roomCode,
+        type:'bt_'+BT_ONLINE.mode+'_'+BT_ONLINE.numPlayers,
+        host_email:U.email,host_name:U.name||U.email,
+        status:'waiting',
+        host_taps:BT_ONLINE.numPlayers,
+        guest_taps:0,
+        host_country:JSON.stringify(BT_ONLINE.players),
+        guest_country:null,
+        created_at:new Date().toISOString(),
+        updated_at:new Date().toISOString()
+      }
+    });
+  }catch(e){}
+  // Deduct coins
+  if(!isAdmin()){U.coins=(U.coins||0)-BT_ONLINE.cost;saveU();syncMiniCoins();}
+  btShowWaitingRoom();
+  btStartHostPollBattle();
+}
+
+async function btOnlineJoin(){
+  if(!U){toast(t('toast_please_login'));return;}
+  if(!isAdmin()&&(U.coins||0)<BT_ONLINE.cost){toast(t('toast_not_enough_coins'));return;}
+  var code=document.getElementById('bton-join-code').value.trim().toUpperCase();
+  if(code.length!==6){toast('Code invalide');return;}
+  try{
+    var rows=await sbFetch('nr_rooms?code=eq.'+code+'&select=code,type,host_email,host_name,status,host_country,host_taps&limit=1');
+    if(!rows||!rows[0]){toast('Room introuvable');return;}
+    var r=rows[0];
+    if(r.status!=='waiting'){toast('Room déjà en cours');return;}
+    // Parse existing players
+    var players=[];
+    try{players=JSON.parse(r.host_country||'[]');}catch(e){}
+    var maxP=r.host_taps||2;
+    if(players.length>=maxP){toast('Room complète');return;}
+    var mySlot=players.length;
+    players.push({email:U.email,name:U.name||U.email,slot:mySlot,ready:true});
+    // Parse mode from type: bt_pvp_3
+    var parts=(r.type||'bt_pvp_2').split('_');
+    BT_ONLINE.mode=parts[1]||'pvp';
+    BT_ONLINE.numPlayers=parseInt(parts[2])||2;
+    BT_ONLINE.roomCode=code;
+    BT_ONLINE.role='guest';
+    BT_ONLINE.mySlot=mySlot;
+    BT_ONLINE.players=players;
+    // Update room
+    await sbFetch('nr_rooms?code=eq.'+code,{
+      method:'PATCH',prefer:'return=minimal',
+      body:{
+        host_country:JSON.stringify(players),
+        guest_email:U.email,
+        guest_name:U.name||U.email,
+        updated_at:new Date().toISOString()
+      }
+    });
+    // Deduct coins
+    if(!isAdmin()){U.coins=(U.coins||0)-BT_ONLINE.cost;saveU();syncMiniCoins();}
+    btShowWaitingRoom();
+    btStartGuestPollBattle();
+  }catch(e){toast('Erreur de connexion');}
+}
+
+function btShowWaitingRoom(){
+  document.getElementById('bton-waiting').style.display='block';
+  var codeEl=document.getElementById('bton-room-code');
+  if(codeEl) codeEl.textContent=BT_ONLINE.roomCode||'------';
+  btRenderPlayerList();
+  var launchBtn=document.getElementById('bton-launch-btn');
+  if(launchBtn) launchBtn.style.display=BT_ONLINE.role==='host'?'block':'none';
+  var status=document.getElementById('bton-status');
+  if(status) status.textContent=BT_ONLINE.role==='host'?'En attente des joueurs...':'En attente du lancement...';
+}
+
+function btRenderPlayerList(){
+  var el=document.getElementById('bton-players-list'); if(!el) return;
+  var html='';
+  for(var i=0;i<BT_ONLINE.numPlayers;i++){
+    var p=BT_ONLINE.players[i];
+    var colors=['#00E676','#64B5F6','#FFD700','#FF5252','#CE93D8'];
+    if(p){
+      html+='<div style="color:'+colors[i%5]+';font-size:.8rem;margin:3px 0">'+
+        '● '+(p.name||p.email)+' '+(p.ready?'✓':'')+'</div>';
+    } else {
+      html+='<div style="color:#333;font-size:.8rem;margin:3px 0">○ En attente...</div>';
+    }
+  }
+  el.innerHTML=html;
+  var launchBtn=document.getElementById('bton-launch-btn');
+  if(launchBtn && BT_ONLINE.role==='host'){
+    launchBtn.style.display=BT_ONLINE.players.length>=2?'block':'none';
+  }
+}
+
+function btStartHostPollBattle(){
+  if(BT_ONLINE.pollId) clearInterval(BT_ONLINE.pollId);
+  BT_ONLINE.pollId=setInterval(async function(){
+    try{
+      var rows=await sbFetch('nr_rooms?code=eq.'+BT_ONLINE.roomCode+'&select=host_country,status&limit=1');
+      if(!rows||!rows[0]) return;
+      var players=[];
+      try{players=JSON.parse(rows[0].host_country||'[]');}catch(e){}
+      BT_ONLINE.players=players;
+      btRenderPlayerList();
+      if(rows[0].status==='playing'){
+        clearInterval(BT_ONLINE.pollId);BT_ONLINE.pollId=null;
+        btLaunchOnlineGame();
+      }
+    }catch(e){}
+  },2000);
+}
+
+function btStartGuestPollBattle(){
+  if(BT_ONLINE.pollId) clearInterval(BT_ONLINE.pollId);
+  BT_ONLINE.pollId=setInterval(async function(){
+    try{
+      var rows=await sbFetch('nr_rooms?code=eq.'+BT_ONLINE.roomCode+'&select=host_country,status&limit=1');
+      if(!rows||!rows[0]) return;
+      var players=[];
+      try{players=JSON.parse(rows[0].host_country||'[]');}catch(e){}
+      BT_ONLINE.players=players;
+      btRenderPlayerList();
+      if(rows[0].status==='playing'){
+        clearInterval(BT_ONLINE.pollId);BT_ONLINE.pollId=null;
+        btLaunchOnlineGame();
+      }
+    }catch(e){}
+  },1500);
+}
+
+async function btOnlineLaunch(){
+  if(BT_ONLINE.players.length<2){toast('Attends au moins 2 joueurs');return;}
+  try{
+    await sbFetch('nr_rooms?code=eq.'+BT_ONLINE.roomCode,{
+      method:'PATCH',prefer:'return=minimal',
+      body:{status:'playing',updated_at:new Date().toISOString()}
+    });
+  }catch(e){}
+  btLaunchOnlineGame();
+}
+
+function btOnlineCopyCode(){
+  try{navigator.clipboard.writeText(BT_ONLINE.roomCode);}catch(e){}
+  toast('📋 '+BT_ONLINE.roomCode);
+}
+
+function btLaunchOnlineGame(){
+  // Close setup modal
+  var setupEl=document.getElementById('bt-online-setup');
+  if(setupEl) setupEl.style.display='none';
+  // Init channel
+  btInitOnlineChannel();
+  // Launch game with online config
+  BT.mode='online';
+  document.getElementById('bt-setup').style.display='none';
+  document.getElementById('bt-game').style.display='block';
+  document.getElementById('bt-result').style.display='none';
+  btInitOnline();
+}
+
+function btInitOnline(){
+  var canvas=document.getElementById('bt-canvas');
+  BT.canvas=canvas;
+  var maxW=Math.min(window.innerWidth,420);
+  BT.W=maxW; BT.H=Math.min(window.innerHeight*0.55,320);
+  canvas.width=BT.W; canvas.height=BT.H;
+  BT.ctx=canvas.getContext('2d');
+  BT.score=0; BT.wave=1; BT.gameOver=false; BT.paused=false;
+  var cfg=btLevelConfig(BT.level);
+
+  // Create players based on room config
+  BT.players=[];
+  var colors=['#00E676','#64B5F6','#FFD700','#FF5252','#CE93D8'];
+  var starts=[[BT.W*0.2,BT.H-50],[BT.W*0.4,BT.H-50],[BT.W*0.6,BT.H-50],[BT.W*0.8,BT.H-50],[BT.W*0.5,BT.H-80]];
+
+  BT_ONLINE.players.forEach(function(op,i){
+    var isMe=(op.email===U.email);
+    BT.players.push({
+      x:starts[i][0], y:starts[i][1],
+      w:20, h:20, hp:cfg.lives, maxHp:cfg.lives,
+      color:colors[i], dx:0, dy:0, angle:0,
+      isAI:false, isMe:isMe, alive:true,
+      id:i, name:op.name||op.email,
+      fireCD:0, slot:i
+    });
+  });
+
+  // In coop/team mode vs AI — enemy team exists
+  BT.enemies=[];
+  if(BT_ONLINE.mode!=='pvp'){
+    btGenerateWalls();
+    btSpawnWave(1,cfg);
+  }
+
+  BT.bullets=[];
+  if(BT_ONLINE.mode==='pvp') btGenerateWalls();
+  btSetupControls();
+  btUpdateHUD();
+  if(BT.loop) clearInterval(BT.loop);
+  BT.running=true;
+  BT.loop=setInterval(btTickOnline,33);
+}
+
+function btTickOnline(){
+  if(!BT.running||BT.paused) return;
+  var cfg=btLevelConfig(BT.level);
+  var myPlayer=BT.players.find(function(p){return p.isMe;});
+  if(!myPlayer||!myPlayer.alive){btEndGame(false);return;}
+
+  // Move my player
+  var spd=cfg.playerSpeed;
+  myPlayer.x+=BT.joystick.dx*spd;
+  myPlayer.y+=BT.joystick.dy*spd;
+  myPlayer.x=Math.max(myPlayer.w/2,Math.min(BT.W-myPlayer.w/2,myPlayer.x));
+  myPlayer.y=Math.max(myPlayer.h/2,Math.min(BT.H-myPlayer.h/2,myPlayer.y));
+  btWallCollide(myPlayer);
+
+  // Fire
+  if(BT.fireActive && myPlayer.fireCD<=0){
+    btFireBullet(myPlayer,false);
+    myPlayer.fireCD=8;
+    // Broadcast move + fire
+    btBroadcastMyState(myPlayer,true);
+  } else {
+    // Broadcast position periodically
+    if(myPlayer.fireCD<=0) btBroadcastMyState(myPlayer,false);
+  }
+  if(myPlayer.fireCD>0) myPlayer.fireCD--;
+
+  // vs AI mode — move enemies
+  if(BT_ONLINE.mode!=='pvp'){
+    BT.enemies.forEach(function(e){
+      if(!e.alive) return;
+      var target=btNearestPlayer(e);
+      if(!target) return;
+      var dx=target.x-e.x,dy=target.y-e.y;
+      var dist=Math.sqrt(dx*dx+dy*dy)||1;
+      e.angle=Math.atan2(dy,dx);
+      e.x+=dx/dist*e.speed; e.y+=dy/dist*e.speed;
+      e.x=Math.max(0,Math.min(BT.W,e.x));
+      e.y=Math.max(0,Math.min(BT.H,e.y));
+      if(e.canShoot){e.fireCD--;if(e.fireCD<=0&&dist<BT.W*0.6){btFireBullet(e,true);e.fireCD=e.shootRate;}}
+    });
+    if(BT.enemies.every(function(e){return !e.alive;})){
+      BT.wave++;
+      setTimeout(function(){if(BT.running)btSpawnWave(BT.wave,btLevelConfig(BT.level));},1500);
+    }
+  }
+
+  // Move bullets — only host processes PvP collision
+  BT.bullets=BT.bullets.filter(function(b){
+    b.x+=Math.cos(b.angle)*b.spd;
+    b.y+=Math.sin(b.angle)*b.spd;
+    if(b.x<0||b.x>BT.W||b.y<0||b.y>BT.H) return false;
+    var hitWall=false;
+    BT.walls.forEach(function(w){if(b.x>w.x&&b.x<w.x+w.w&&b.y>w.y&&b.y<w.y+w.h)hitWall=true;});
+    if(hitWall) return false;
+    // Hit enemies (coop/team mode)
+    if(!b.isEnemy){
+      BT.enemies.forEach(function(e){
+        if(!e.alive) return;
+        if(Math.abs(b.x-e.x)<12&&Math.abs(b.y-e.y)<12){e.hp--;b.dead=true;if(e.hp<=0){e.alive=false;BT.score+=10*BT.level;}}
+      });
+    }
+    // PvP: hit other players
+    if(BT_ONLINE.mode==='pvp'&&!b.fromMe){
+      if(myPlayer.alive&&Math.abs(b.x-myPlayer.x)<12&&Math.abs(b.y-myPlayer.y)<12){
+        myPlayer.hp--;b.dead=true;
+        if(myPlayer.hp<=0){myPlayer.alive=false;}
+      }
+    }
+    return !b.dead;
+  });
+
+  btUpdateHUD();
+  btDraw();
+}
+
+// Broadcast my position and state
+var _btLastBroadcast=0;
+function btBroadcastMyState(p, withFire){
+  var now=Date.now();
+  if(!withFire && now-_btLastBroadcast<100) return;
+  _btLastBroadcast=now;
+  if(!BT_ONLINE.channel) return;
+  try{
+    BT_ONLINE.channel.send({type:'broadcast',event:'bt_move',payload:{
+      slot:p.slot, x:p.x, y:p.y, hp:p.hp,
+      angle:p.angle, alive:p.alive,
+      fire:withFire
+    }});
+  }catch(e){}
+}
+
+// Init Supabase Realtime channel for battle
+function btInitOnlineChannel(){
+  btOnlineCloseChannel();
+  try{
+    var client=_getSupabaseClient();
+    if(!client) return;
+    BT_ONLINE.channel=client.channel('bt-'+BT_ONLINE.roomCode,{
+      config:{broadcast:{self:false,ack:false}}
+    });
+    BT_ONLINE.channel.on('broadcast',{event:'bt_move'},function(payload){
+      btHandleOpponentMove(payload.payload);
+    });
+    BT_ONLINE.channel.subscribe();
+  }catch(e){}
+}
+
+function btOnlineCloseChannel(){
+  if(BT_ONLINE.channel){
+    try{BT_ONLINE.channel.unsubscribe();}catch(e){}
+    BT_ONLINE.channel=null;
+  }
+}
+
+function btHandleOpponentMove(data){
+  if(!data||data.slot===undefined) return;
+  var p=BT.players[data.slot];
+  if(!p||p.isMe) return;
+  p.x=data.x; p.y=data.y;
+  p.hp=data.hp; p.angle=data.angle;
+  p.alive=data.alive;
+  if(data.fire){
+    // Show opponent's bullet
+    btFireBullet({x:p.x,y:p.y,angle:p.angle},false);
+    // For PvP: mark bullet as not from me
+    if(BT.bullets.length>0) BT.bullets[BT.bullets.length-1].fromMe=false;
+  }
+}
 </script>
 <!-- Modal master code pour affilies -->
 <div id="aff-mc-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);
@@ -11643,6 +12676,134 @@ function notifyMyTurn(gameName){
           <button onclick="resetGomoku()" style="background:rgba(206,147,216,.15);border:1px solid rgba(206,147,216,.4);color:#CE93D8;padding:10px 20px;border-radius:12px;cursor:pointer;font-weight:700" data-tr="morpion_restart">↩ Rejouer</button>
           <button onclick="closeGoResult()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;padding:10px 20px;border-radius:12px;cursor:pointer" data-tr="morpion_menu">Menu</button>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- CARIDA BATTLE PAGE -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="pg" id="pg-battle" style="background:#0a0a0a">
+  <div class="menu-header" style="background:#111">
+    <button onclick="battleExit()" style="background:none;border:none;color:#FF5252;font-size:1.4rem;cursor:pointer;padding:4px 8px">‹</button>
+    <div class="logo" style="font-size:1.1rem;color:#FF5252" data-tr="battle_title">Carida Battle</div>
+    <div style="display:flex;gap:8px;align-items:center;font-size:.8rem">
+      <span style="color:#FF5252">❤️ <span id="bt-lives">3</span></span>
+      <span style="color:#FFD700">⭐ <span id="bt-score">0</span></span>
+      <span style="color:#64B5F6">Niv.<span id="bt-level">1</span></span>
+    </div>
+  </div>
+
+  <!-- Setup screen -->
+  <div id="bt-setup" style="padding:16px;max-width:380px;margin:0 auto;text-align:center">
+    <div style="color:#8899AA;font-size:.8rem;letter-spacing:2px;margin-bottom:14px" data-tr="battle_choose_mode">CHOISIR LE MODE</div>
+
+    <button onclick="btStartMode('solo')" style="width:100%;margin-bottom:10px;background:rgba(255,82,82,.1);border:1px solid rgba(255,82,82,.3);color:#FF5252;padding:14px;border-radius:12px;font-size:1rem;cursor:pointer">
+      🤖 <span data-tr="battle_solo">Solo vs IA</span>
+    </button>
+    <button onclick="btStartMode('coop')" style="width:100%;margin-bottom:10px;background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.25);color:#00E676;padding:14px;border-radius:12px;font-size:1rem;cursor:pointer">
+      👥 <span data-tr="battle_coop">Coopératif vs IA</span>
+    </button>
+    <button onclick="btShowOnlineSetup()" style="width:100%;margin-bottom:10px;background:rgba(100,181,246,.08);border:1px solid rgba(100,181,246,.25);color:#64B5F6;padding:14px;border-radius:12px;font-size:1rem;cursor:pointer">
+      🌐 <span data-tr="battle_online">Online PvP</span>
+    </button>
+
+    <!-- Level selector -->
+    <div style="margin-top:16px;background:rgba(255,255,255,.04);border-radius:12px;padding:12px">
+      <div style="color:#8899AA;font-size:.75rem;margin-bottom:8px" data-tr="battle_level">NIVEAU</div>
+      <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
+        <button onclick="btSetLevel(1)" id="btlv-1" class="btlv-btn" style="background:rgba(0,230,118,.2);border:2px solid #00E676;color:#00E676;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.8rem">1</button>
+        <button onclick="btSetLevel(2)" id="btlv-2" class="btlv-btn" style="background:transparent;border:1px solid #333;color:#666;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.8rem">2</button>
+        <button onclick="btSetLevel(3)" id="btlv-3" class="btlv-btn" style="background:transparent;border:1px solid #333;color:#666;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.8rem">3</button>
+        <button onclick="btSetLevel(4)" id="btlv-4" class="btlv-btn" style="background:transparent;border:1px solid #333;color:#666;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.8rem">4</button>
+        <button onclick="btSetLevel(5)" id="btlv-5" class="btlv-btn" style="background:transparent;border:1px solid #333;color:#666;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.8rem">5</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game canvas -->
+  <div id="bt-game" style="display:none;position:relative">
+    <canvas id="bt-canvas" style="display:block;width:100%;max-width:420px;margin:0 auto;touch-action:none;border-top:1px solid #222"></canvas>
+
+    <!-- Wave info -->
+    <div id="bt-wave-banner" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.85);color:#FF5252;font-size:1.8rem;font-weight:900;padding:16px 32px;border-radius:16px;border:2px solid #FF5252;text-align:center;z-index:10"></div>
+
+    <!-- Touch controls -->
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:#0a0a0a;max-width:420px;margin:0 auto">
+      <!-- Left joystick -->
+      <div id="bt-joystick-area" style="width:110px;height:110px;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);border-radius:50%;position:relative;touch-action:none">
+        <div id="bt-joystick-knob" style="width:44px;height:44px;background:rgba(255,255,255,.2);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none"></div>
+      </div>
+      <!-- Center info -->
+      <div style="text-align:center">
+        <div id="bt-wave-num" style="color:#FF5252;font-size:.8rem;font-weight:700"></div>
+        <div id="bt-enemies-left" style="color:#8899AA;font-size:.7rem"></div>
+      </div>
+      <!-- Right fire button -->
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+        <button id="bt-fire-btn" style="width:80px;height:80px;background:rgba(255,82,82,.25);border:3px solid #FF5252;border-radius:50%;color:#FF5252;font-size:1.8rem;cursor:pointer;touch-action:none" ontouchstart="btFireStart(event)" ontouchend="btFireEnd(event)">🔫</button>
+        <button onclick="btTogglePause()" style="background:rgba(255,255,255,.08);border:1px solid #333;color:#aaa;padding:4px 12px;border-radius:8px;font-size:.7rem;cursor:pointer">⏸</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Online Setup Modal -->
+  <div id="bt-online-setup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:300;align-items:flex-start;justify-content:center;overflow-y:auto;padding-top:20px">
+    <div style="background:#111;border:2px solid rgba(100,181,246,.3);border-radius:20px;padding:24px;max-width:340px;width:90%;margin:0 auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div style="color:#64B5F6;font-size:1rem;font-weight:900">🌐 Online Battle</div>
+        <button onclick="btCloseOnlineSetup()" style="background:none;border:none;color:#666;font-size:1.3rem;cursor:pointer">✕</button>
+      </div>
+
+      <!-- Number of players -->
+      <div style="color:#8899AA;font-size:.75rem;letter-spacing:2px;margin-bottom:8px">NOMBRE DE JOUEURS</div>
+      <div style="display:flex;gap:6px;margin-bottom:14px">
+        <button onclick="btSetOnlinePlayers(2)" id="bton-p2" class="bton-btn" style="flex:1;padding:8px;border-radius:8px;border:2px solid #64B5F6;background:rgba(100,181,246,.2);color:#64B5F6;cursor:pointer;font-weight:700">2</button>
+        <button onclick="btSetOnlinePlayers(3)" id="bton-p3" class="bton-btn" style="flex:1;padding:8px;border-radius:8px;border:1px solid #333;background:transparent;color:#666;cursor:pointer">3</button>
+        <button onclick="btSetOnlinePlayers(4)" id="bton-p4" class="bton-btn" style="flex:1;padding:8px;border-radius:8px;border:1px solid #333;background:transparent;color:#666;cursor:pointer">4</button>
+        <button onclick="btSetOnlinePlayers(5)" id="bton-p5" class="bton-btn" style="flex:1;padding:8px;border-radius:8px;border:1px solid #333;background:transparent;color:#666;cursor:pointer">5</button>
+      </div>
+
+      <!-- Game mode -->
+      <div style="color:#8899AA;font-size:.75rem;letter-spacing:2px;margin-bottom:8px">MODE DE JEU</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+        <button onclick="btSetOnlineMode('pvp')" id="bton-pvp" class="bton-mode" style="padding:10px;border-radius:10px;border:2px solid #FF5252;background:rgba(255,82,82,.15);color:#FF5252;cursor:pointer;font-size:.9rem">⚔️ Joueurs contre Joueurs (PvP)</button>
+        <button onclick="btSetOnlineMode('coop_ai')" id="bton-coop" class="bton-mode" style="padding:10px;border-radius:10px;border:1px solid #333;background:transparent;color:#666;cursor:pointer;font-size:.9rem">🤖 Tous contre l'IA</button>
+        <button onclick="btSetOnlineMode('team_ai')" id="bton-team" class="bton-mode" style="padding:10px;border-radius:10px;border:1px solid #333;background:transparent;color:#666;cursor:pointer;font-size:.9rem">👥 Équipes contre l'IA (2v2)</button>
+      </div>
+
+      <!-- Create or Join -->
+      <div style="color:#8899AA;font-size:.75rem;letter-spacing:2px;margin-bottom:8px">REJOINDRE OU CRÉER</div>
+      <button onclick="btOnlineCreate()" style="width:100%;margin-bottom:8px;background:rgba(100,181,246,.15);border:2px solid rgba(100,181,246,.4);color:#64B5F6;padding:12px;border-radius:12px;cursor:pointer;font-weight:700">🌐 Créer une Room <span style="font-size:.7rem;color:#8899AA">15🪙</span></button>
+      <div style="display:flex;gap:8px">
+        <input id="bton-join-code" type="text" maxlength="6" placeholder="CODE" style="flex:1;text-align:center;font-size:1.2rem;font-weight:900;letter-spacing:4px;color:#FFD700;background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.2);border-radius:10px;padding:10px;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+        <button onclick="btOnlineJoin()" style="background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.3);color:#FFD700;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700">🔗</button>
+      </div>
+
+      <!-- Waiting room -->
+      <div id="bton-waiting" style="display:none;margin-top:14px;background:rgba(255,255,255,.04);border-radius:12px;padding:12px;text-align:center">
+        <div id="bton-room-code" style="font-size:2rem;font-weight:900;letter-spacing:8px;color:#FFD700;margin-bottom:8px"></div>
+        <div style="color:#8899AA;font-size:.75rem;margin-bottom:10px">Partage ce code avec tes amis</div>
+        <div id="bton-players-list" style="margin-bottom:10px"></div>
+        <button onclick="btOnlineCopyCode()" style="background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.3);color:#FFD700;padding:6px 16px;border-radius:8px;cursor:pointer;font-size:.8rem;margin-bottom:8px">📋 Copier</button>
+        <br>
+        <button id="bton-launch-btn" onclick="btOnlineLaunch()" style="display:none;width:100%;background:rgba(0,230,118,.15);border:2px solid rgba(0,230,118,.4);color:#00E676;padding:12px;border-radius:12px;cursor:pointer;font-weight:900;margin-top:8px">▶ LANCER LA PARTIE</button>
+        <div id="bton-status" style="color:#64B5F6;font-size:.8rem;margin-top:6px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Result modal -->
+  <div id="bt-result" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;align-items:center;justify-content:center;flex-direction:column">
+    <div style="background:#1a0a0a;border:2px solid rgba(255,82,82,.4);border-radius:20px;padding:28px 24px;text-align:center;max-width:300px">
+      <div id="bt-result-icon" style="font-size:3rem;margin-bottom:10px">🏆</div>
+      <div id="bt-result-text" style="font-size:1.2rem;font-weight:900;color:#FF5252;margin-bottom:6px"></div>
+      <div id="bt-result-wave" style="color:#8899AA;font-size:.85rem;margin-bottom:4px"></div>
+      <div id="bt-result-coins" style="color:#00E676;font-size:.9rem;margin-bottom:20px"></div>
+      <div style="display:flex;gap:10px;justify-content:center">
+        <button onclick="btRestart()" style="background:rgba(255,82,82,.15);border:1px solid rgba(255,82,82,.4);color:#FF5252;padding:10px 20px;border-radius:12px;cursor:pointer;font-weight:700">↩ Rejouer</button>
+        <button onclick="battleExit()" style="background:rgba(255,255,255,.08);border:1px solid #333;color:#aaa;padding:10px 20px;border-radius:12px;cursor:pointer">Menu</button>
       </div>
     </div>
   </div>
