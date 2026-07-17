@@ -10313,7 +10313,7 @@ function mgHandleRematch(data){
   }
 }
 
-function mgCreateRoom(game){
+async function mgCreateRoom(game){
   if(!U){toast(t('toast_please_login'));G('pg-login');return;}
   // Check mini-game online unlock — each game separate
   if(!isAdmin()&&!isMgGameUnlocked(game)){
@@ -10339,7 +10339,13 @@ function mgCreateRoom(game){
   document.getElementById('mg-guest-joined').style.display='none';
   document.getElementById('mg-start-btn').style.display='none';
   document.getElementById('mg-ol-coins').textContent=U.coins||0;
-  mgSaveRoom();
+  // Wait for room to be saved in Supabase BEFORE showing code
+  var saved = await mgSaveRoom();
+  if(!saved && saved !== true){
+    // Retry once
+    await new Promise(function(r){setTimeout(r,500);});
+    await mgSaveRoom();
+  }
   mgStartHostPoll();
 }
 
@@ -10367,7 +10373,7 @@ function mgJoinRoom(game){
 
 async function mgSaveRoom(){
   try{
-    await sbFetch('nr_rooms?on_conflict=code',{
+    var result = await sbFetch('nr_rooms?on_conflict=code',{
       method:'POST',prefer:'resolution=merge-duplicates,return=minimal',
       body:{
         code:MG_ONLINE.roomCode, type:'mg_'+MG_ONLINE.game,
@@ -10378,7 +10384,11 @@ async function mgSaveRoom(){
         created_at:new Date().toISOString(), updated_at:new Date().toISOString()
       }
     });
-  }catch(e){}
+    return result;
+  }catch(e){
+    console.log('mgSaveRoom error:', e);
+    return null;
+  }
 }
 
 function mgCopyCode(){
@@ -10415,7 +10425,13 @@ async function mgConfirmJoin(){
   document.getElementById('mg-join-status').textContent='🔍 Recherche...';
   try{
     var rows=await sbFetch('nr_rooms?code=eq.'+code+'&select=code,type,host_email,host_name,status,guest_email&limit=1');
-    if(!rows||!rows[0]){document.getElementById('mg-join-status').textContent='❌ Room introuvable';return;}
+    if(!rows||!rows[0]){
+      document.getElementById('mg-join-status').textContent='❌ Room introuvable — Vérifie le code';
+      // Retry once after 1 second (host may still be saving)
+      await new Promise(function(r){setTimeout(r,1000);});
+      rows = await sbFetch('nr_rooms?code=eq.'+code+'&select=code,type,host_email,host_name,status,guest_email&limit=1');
+      if(!rows||!rows[0]){document.getElementById('mg-join-status').textContent='❌ Room introuvable';return;}
+    }
     var r=rows[0];
     if(r.status!=='waiting'){document.getElementById('mg-join-status').textContent='❌ Room déjà en cours';return;}
     if(r.guest_email){document.getElementById('mg-join-status').textContent='❌ Room déjà complète';return;}
@@ -11455,8 +11471,8 @@ function btInit(){
   var canvas=document.getElementById('bt-canvas');
   BT.canvas=canvas;
   // Fit screen
-  var maxW=Math.min(window.innerWidth, 420);
-  BT.W=maxW; BT.H=Math.min(window.innerHeight*0.55, 320);
+  var maxW=Math.min(window.innerWidth, 480);
+  BT.W=maxW; BT.H=Math.min(window.innerHeight*0.62, 380);
   canvas.width=BT.W; canvas.height=BT.H;
   BT.ctx=canvas.getContext('2d');
   BT.score=0; BT.wave=1; BT.gameOver=false; BT.paused=false;
@@ -12239,8 +12255,8 @@ function btLaunchOnlineGame(){
 function btInitOnline(){
   var canvas=document.getElementById('bt-canvas');
   BT.canvas=canvas;
-  var maxW=Math.min(window.innerWidth,420);
-  BT.W=maxW; BT.H=Math.min(window.innerHeight*0.55,320);
+  var maxW=Math.min(window.innerWidth,480);
+  BT.W=maxW; BT.H=Math.min(window.innerHeight*0.62,380);
   canvas.width=BT.W; canvas.height=BT.H;
   BT.ctx=canvas.getContext('2d');
   BT.score=0; BT.wave=1; BT.gameOver=false; BT.paused=false;
