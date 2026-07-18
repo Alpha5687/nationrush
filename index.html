@@ -134,6 +134,77 @@ window.addEventListener('appinstalled', function() {
 <!-- ADSTERRA Social Bar — chargé dès le démarrage -->
 <script src="https://pl29682872.effectivecpmnetwork.com/e8/f6/a3/e8f6a37ac85ee36fd6c9174c8f136962.js"></script>
 <style>
+/* Adsterra Social Bar — rendre fermable par glissement */
+#adsterra-social-bar-container,
+[id*="adsterra"],
+[class*="social-bar"],
+[class*="push-notification-bar"],
+div[style*="position:fixed"][style*="bottom:0"],
+div[style*="position: fixed"][style*="bottom: 0"]{
+  transition: transform 0.3s ease !important;
+}
+</style>
+<script>
+// Rendre la Social Bar Adsterra glissable/fermable
+(function(){
+  function makeAdDismissible(){
+    // Chercher les éléments flottants en bas de l'écran
+    var bars = document.querySelectorAll('div[style*="position:fixed"], div[style*="position: fixed"]');
+    bars.forEach(function(bar){
+      var style = bar.getAttribute('style')||'';
+      var rect = bar.getBoundingClientRect();
+      // Cibler les barres en bas de l'écran (Social Bar Adsterra)
+      if((style.includes('bottom:0')||style.includes('bottom: 0')||rect.bottom>=window.innerHeight-100)
+         && bar.id !== 'adm' && !bar.closest('#adm')){
+        if(bar._adDismissible) return;
+        bar._adDismissible = true;
+
+        // Ajouter bouton X pour fermer
+        var closeBtn = document.createElement('button');
+        closeBtn.textContent = '✕';
+        closeBtn.style.cssText = 'position:absolute;top:2px;right:4px;z-index:99999;' +
+          'background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;' +
+          'width:22px;height:22px;font-size:12px;cursor:pointer;line-height:1;padding:0;';
+        closeBtn.onclick = function(e){
+          e.stopPropagation();
+          // Minimise temporairement — revient après 8 secondes
+          bar.style.transform = 'translateY(110%)';
+          setTimeout(function(){ 
+            bar.style.transform = 'translateY(0)';
+          }, 8000);
+        };
+        bar.style.position = 'fixed';
+        bar.style.overflow = 'visible';
+        bar.appendChild(closeBtn);
+
+        // Swipe to dismiss (glisser vers le bas pour fermer)
+        var startY = 0, startX = 0;
+        bar.addEventListener('touchstart', function(e){
+          startY = e.touches[0].clientY;
+          startX = e.touches[0].clientX;
+        }, {passive:true});
+        bar.addEventListener('touchend', function(e){
+          var dy = e.changedTouches[0].clientY - startY;
+          var dx = Math.abs(e.changedTouches[0].clientX - startX);
+          // Glisser vers le bas OU gauche/droite pour fermer
+          if(dy > 40 || dx > 80){
+            // Minimise temporairement — revient après 8 secondes
+            bar.style.transform = 'translateY(110%)';
+            setTimeout(function(){ 
+              bar.style.transform = 'translateY(0)';
+            }, 8000);
+          }
+        }, {passive:true});
+      }
+    });
+  }
+  // Vérifier plusieurs fois après chargement (la Social Bar charge après)
+  setTimeout(makeAdDismissible, 2000);
+  setTimeout(makeAdDismissible, 4000);
+  setTimeout(makeAdDismissible, 7000);
+})();
+</script>
+<style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;overflow:hidden;background:#08111f;color:#fff;
   font-family:'Barlow Condensed',sans-serif}
@@ -1266,13 +1337,6 @@ body.rtl .rrow{flex-direction:row-reverse}
 <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
   <span></span><span></span><span></span>
 </div>
-
-<!-- Bouton cacher bannière pub -->
-<button id="btn-hide-ad" onclick="hideAdBanner()" title="Cacher la pub"
-  style="position:fixed;top:10px;left:10px;z-index:900;
-    background:rgba(0,0,0,.55);color:#fff;border:1px solid rgba(255,255,255,.2);
-    border-radius:8px;padding:4px 8px;font-size:.7rem;cursor:pointer;
-    display:none;line-height:1.4">📢 ✕</button>
 
 <!-- ══════════ SIDEBAR OVERLAY ══════════ -->
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -2585,8 +2649,6 @@ let RACE_CT=0;
 let RACE_ON=false, RACE_START=0, LAST_TS=0, LEG=0, PLACE=0;
 let PI=0, P2I=1, T1I=0, T2I=1;
 let AD_CB=null;
-var _lastGamePage = null;    // Page active avant la pub
-var _lastResultModal = null; // Modal résultat ouvert avant la pub
 let P1C=null,P2C=null,T1C=null,T2C=null,SOC=null;
 let PK_MODE='',PK_PLAYER=0;
 let ATAP=0,ATAP_T=null;
@@ -3074,11 +3136,6 @@ function chkUnlockCode(el){
       else if(UNLOCK_TARGET==='multi-online'){goMultiOnline();}
       else if(UNLOCK_TARGET==='2v2-online'){go2v2Online();}
       else if(UNLOCK_TARGET==='team-battle'){goTeamBattleOnline();}
-      else if(UNLOCK_TARGET&&UNLOCK_TARGET.startsWith('mg-online-')){
-        var _g2=UNLOCK_TARGET.replace('mg-online-','');
-        setMgGameUnlocked(_g2);
-        G('pg-menu'); toast('🎮 '+(_g2==='morpion'?'Titato':_g2==='gomoku'?'Gomoku':'Damier')+' Online débloqué !');
-      }
       else{G('pg-menu');}
     },400);
   } else {
@@ -4847,17 +4904,8 @@ function collectAd(){
   }
 
   if(AD_CB){AD_CB();AD_CB=null;}else{
-    // Retourner à la page + modal résultat où le joueur était avant la pub
-    if(_lastGamePage && document.getElementById(_lastGamePage)){
-      G(_lastGamePage);
-      // Ré-afficher le modal résultat s'il était ouvert
-      if(_lastResultModal){
-        var rm=document.getElementById(_lastResultModal);
-        if(rm) rm.style.display='flex';
-        _lastResultModal=null;
-      }
-      _lastGamePage=null;
-    } else if(RACE_MODE==='solo') G('pg-menu');
+    // Retourner a la page du mode de jeu precedent
+    if(RACE_MODE==='solo') G('pg-menu');
     else if(RACE_MODE==='1v1') G('pg-1v1');
     else if(RACE_MODE==='3p') G('pg-3p');
     else if(RACE_MODE==='2v2') G('pg-2v2');
@@ -5089,7 +5137,6 @@ function isPrevUnlocked(mode){
   if(mode==='multi-online') return !!(um['online']);
   if(mode==='2v2-online') return !!(um['multi-online']);
   if(mode==='team-battle') return !!(um['2v2-online']);
-  if(mode&&mode.startsWith('mg-online-')) return true; // Pas de prérequis pour mini-jeux online
   return true;
 }
 
@@ -5106,11 +5153,7 @@ function unlockWithCoins(){
   toast(t('toast_mode_unlocked'));
   if(UNLOCK_TARGET==='3p'){P1C=null;P2C=null;P3C=null;resetPk3p();G('pg-3p');}
   else if(UNLOCK_TARGET==='2v2'){T1C=null;T2C=null;resetPk2v2();G('pg-2v2');}
-  else if(UNLOCK_TARGET&&UNLOCK_TARGET.startsWith('mg-online-')){
-    var _g=UNLOCK_TARGET.replace('mg-online-','');
-    setMgGameUnlocked(_g);
-    G('pg-menu'); toast('🎮 '+(_g==='morpion'?'Titato':_g==='gomoku'?'Gomoku':'Damier')+' Online débloqué !');
-  } else if(UNLOCK_TARGET==='online'||UNLOCK_TARGET==='multi-online'){
+  else if(UNLOCK_TARGET==='online'||UNLOCK_TARGET==='multi-online'){
     G('pg-menu');
     setTimeout(function(){
       if(UNLOCK_TARGET==='online') goOnline();
@@ -5124,12 +5167,11 @@ function unlockWithCoins(){
 function showUnlock(mode,cost){
   UNLOCK_TARGET=mode; UNLOCK_COST=cost;
   const $=id=>document.getElementById(id);
-  const icons={'3p':'👥','2v2':'🤝','online':'🌐','multi-online':'🌍','2v2-online':'⚔️','team-battle':'👑','mg-online-morpion':'⭕','mg-online-gomoku':'⚫','mg-online-damier':'♟️'};
+  const icons={'3p':'👥','2v2':'🤝','online':'🌐','multi-online':'🌍','2v2-online':'⚔️','team-battle':'👑'};
   const names={
     '3p':t('m3_title'),'2v2':t('m4_title'),
     'online':'1v1 Online','multi-online':'Multi Online',
-    '2v2-online':'2v2 Online','team-battle':'Team Battle Online',
-    'mg-online-morpion':'Titato Online','mg-online-gomoku':'Gomoku Online','mg-online-damier':'Damier Online'
+    '2v2-online':'2v2 Online','team-battle':'Team Battle Online'
   };
   $('ul-icon').textContent=icons[mode]||'🔒';
   $('ul-title').textContent=t('unlock_title');
@@ -6816,11 +6858,7 @@ var _2v2olCode='', _2v2olPolling=null, _teamSize=2;
 
 function go2v2Online(){
   if(!U){toast(t('toast_please_login'));G('pg-login');return;}
-  if(!isModeUnlocked('2v2-online')){
-    toast('🔒 Mode en développement — Master Code requis');
-    showUnlock('2v2-online',400);
-    return;
-  }
+  if(!isModeUnlocked('2v2-online')){showUnlock('2v2-online',400);return;}
   if(!isAdmin()&&(U.coins||0)<ONLINE_COST){toast(ONLINE_COST+' pieces requises');return;}
   document.getElementById('2v2ol-code').textContent='--';
   document.getElementById('2v2ol-teams').style.display='none';
@@ -6986,11 +7024,7 @@ var _tbCode='', _tbPolling=null;
 
 function goTeamBattleOnline(){
   if(!U){toast(t('toast_please_login'));G('pg-login');return;}
-  if(!isModeUnlocked('team-battle')){
-    toast('🔒 Mode en développement — Master Code requis');
-    showUnlock('team-battle',500);
-    return;
-  }
+  if(!isModeUnlocked('team-battle')){showUnlock('team-battle',500);return;}
   if(!isAdmin()&&(U.coins||0)<ONLINE_COST){toast(ONLINE_COST+' pieces requises');return;}
   _teamSize=2;
   document.querySelectorAll('.pc-btn').forEach(function(b){b.classList.remove('sel');});
@@ -9390,17 +9424,6 @@ var MG_GAME_CT = 0;
 function mgCountGame(){
   MG_GAME_CT++;
   if(MG_GAME_CT % 2 === 0){
-    // Sauvegarder la page active + le modal résultat ouvert
-    var activePg = document.querySelector('.pg.on');
-    if(activePg) _lastGamePage = activePg.id;
-    var results=['mo-result','go-result','da-result','tet-over'];
-    _lastResultModal=null;
-    for(var i=0;i<results.length;i++){
-      var r=document.getElementById(results[i]);
-      if(r&&(r.style.display==='flex'||r.style.display==='block')){
-        _lastResultModal=results[i]; break;
-      }
-    }
     setTimeout(function(){ if(typeof showAd==='function') showAd(); }, 1500);
   }
 }
@@ -9531,23 +9554,12 @@ function moEndGame(result){
 }
 function resetMorpion(){
   document.getElementById('mo-result').style.display='none';
-  if(MO.mode==='online'){
-    // Online: recréer une room automatiquement
-    mgRestartOnline('morpion');
-  } else {
-    startMorpion(MO.mode);
-  }
+  startMorpion(MO.mode);
 }
 function closeMoResult(){
   document.getElementById('mo-result').style.display='none';
   document.getElementById('mo-setup').style.display='block';
   document.getElementById('mo-game').style.display='none';
-  // Close channel and delete room when leaving
-  if(MO.mode==='online'){
-    mgCloseChannel();
-    if(MG_ONLINE.roomCode) sbFetch('nr_rooms?code=eq.'+MG_ONLINE.roomCode,{method:'DELETE',prefer:'return=minimal'}).catch(function(){});
-    MG_ONLINE.roomCode=null;
-  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -9823,16 +9835,15 @@ function daGetMoves(board,r,c,captureOnly){
         var target=board[nr][nc];
         if(target===0){
           if(!captureOnly||captured){
-            // Dame peut se placer sur TOUTES les cases vides après le pion capturé
             moves.push({fr:r,fc:c,tr:nr,tc:nc,cr:capturedR,cc:capturedC,cap:captured!==null});
           }
-          // Continuer dans la même direction (ne pas s'arrêter après capture)
+          if(captured) break; // Après capture on s'arrête au premier vide
           nr+=dr; nc+=dc;
         } else if(daOwner(target)!==owner&&!captured){
           // Pion ennemi — on peut capturer
           captured=target; capturedR=nr; capturedC=nc;
           nr+=dr; nc+=dc;
-        } else { break; } // Bloqué (pion allié ou 2ème ennemi)
+        } else { break; }
       }
     });
   } else {
@@ -9959,28 +9970,11 @@ function daApplyMove(mv){
   if(mv.cap){
     var chain=daGetMoves(b,mv.tr,mv.tc,true).filter(function(m){return m.cap;});
     if(chain.length>0){
-      DA.mustCapture=true;
-      daDrawBoard();
-      if(DA.mode==='ai'&&DA.turn===2){
-        // IA continue la chaîne automatiquement
-        setTimeout(function(){
-          // Choisir la meilleure capture dans la chaîne
-          var best=chain[Math.floor(Math.random()*chain.length)];
-          if(DIFF.da==='hard'){
-            // Hard: préférer la capture qui ouvre le plus de captures suivantes
-            var bestScore=-1;
-            chain.forEach(function(cm){
-              var next=daGetMoves(b,cm.tr,cm.tc,true).filter(function(x){return x.cap;});
-              if(next.length>bestScore){bestScore=next.length;best=cm;}
-            });
-          }
-          daApplyMove(best);
-        },400);
-        return;
-      }
-      // Humain — sélectionner la pièce pour continuer
+      // Continuer avec la même pièce
       DA.selected={r:mv.tr,c:mv.tc};
       DA.validMoves=chain;
+      DA.mustCapture=true;
+      daDrawBoard();
       updateDaStatus();
       return;
     }
@@ -10148,21 +10142,12 @@ function daEndGame(winner){
 
 function resetDamier(){
   document.getElementById('da-result').style.display='none';
-  if(DA.mode==='online'){
-    mgRestartOnline('damier');
-  } else {
-    startDamier(DA.mode);
-  }
+  startDamier(DA.mode);
 }
 function closeDaResult(){
   document.getElementById('da-result').style.display='none';
   document.getElementById('da-setup').style.display='block';
   document.getElementById('da-game').style.display='none';
-  if(DA.mode==='online'){
-    mgCloseChannel();
-    if(MG_ONLINE.roomCode) sbFetch('nr_rooms?code=eq.'+MG_ONLINE.roomCode,{method:'DELETE',prefer:'return=minimal'}).catch(function(){});
-    MG_ONLINE.roomCode=null;
-  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -10178,106 +10163,13 @@ var MG_ONLINE = {
   channel: null,
   pollId: null,
   active: false,
-  cost: 15,
-  _oppWantsRematch: false
+  cost: 15
 };
 
 // ── NAVIGATION ──
-
-// ── Mini-game online unlock — chaque jeu séparé (200 coins ou Master Code) ──
-function isMgGameUnlocked(game){
-  if(isAdmin()) return true;
-  var key = 'nr_mg_online_'+game;
-  return localStorage.getItem(key) === '1' ||
-         !!(U && U.unlockedModes && U.unlockedModes['mg-online-'+game]);
-}
-function setMgGameUnlocked(game){
-  localStorage.setItem('nr_mg_online_'+game, '1');
-}
-function showMgGameUnlock(game){
-  // Store which game needs unlock
-  _mg_unlock_game = game;
-  showUnlock('mg-online-'+game, 200);
-}
-var _mg_unlock_game = null;
-// ── REJOUER ONLINE — les deux joueurs confirment via Realtime ──
-var MG_RESTART_PENDING = false;
-
-// Helper: show waiting state on result page
-function mgShowWaitingResult(game){
-  var resultId = game==='morpion'?'mo-result':game==='gomoku'?'go-result':'da-result';
-  var textId   = game==='morpion'?'mo-result-text':game==='gomoku'?'go-result-text':'da-result-text';
-  var iconId   = game==='morpion'?'mo-result-icon':game==='gomoku'?'go-result-icon':'da-result-icon';
-  var coinsId  = game==='morpion'?'mo-result-coins':game==='gomoku'?'go-result-coins':'da-result-coins';
-  // Keep result visible but show waiting message
-  var res=document.getElementById(resultId); if(res) res.style.display='flex';
-  var ic=document.getElementById(iconId);   if(ic) ic.textContent='⏳';
-  var tx=document.getElementById(textId);   if(tx) tx.textContent='En attente de '+(MG_ONLINE.oppName||'adversaire')+'...';
-  var co=document.getElementById(coinsId);  if(co) co.textContent='';
-}
-
-// Helper: actually launch new game round
-function mgDoRelaunch(game){
-  MG_RESTART_PENDING = false;
-  // Deduct coins for new round
-  if(U&&!isAdmin()){U.coins=(U.coins||0)-MG_ONLINE.cost;saveU();syncMiniCoins();}
-  // Hide result, launch game board
-  var resultId=game==='morpion'?'mo-result':game==='gomoku'?'go-result':'da-result';
-  var el=document.getElementById(resultId); if(el) el.style.display='none';
-  setTimeout(function(){
-    if(game==='morpion')      mgLaunchMorpion();
-    else if(game==='gomoku')  mgLaunchGomoku();
-    else if(game==='damier')  mgLaunchDamier();
-  },300);
-}
-
-function mgRestartOnline(game){
-  MG_RESTART_PENDING = true;
-  // Re-init channel if needed (may have been closed)
-  if(!MG_ONLINE.channel && MG_ONLINE.roomCode){
-    mgInitChannel();
-    // Wait a moment for channel to connect then send
-    setTimeout(function(){
-      if(MG_ONLINE.channel){
-        try{ MG_ONLINE.channel.send({type:'broadcast',event:'mg_rematch',payload:{game:game}}); }catch(e){}
-      }
-    }, 800);
-  } else if(MG_ONLINE.channel){
-    try{
-      MG_ONLINE.channel.send({type:'broadcast',event:'mg_rematch',
-        payload:{game:game}});
-    }catch(e){}
-  }
-  // If opponent already clicked rematch (their signal arrived first)
-  if(MG_ONLINE._oppWantsRematch){
-    MG_ONLINE._oppWantsRematch = false;
-    mgDoRelaunch(game); // Both confirmed — go!
-    return;
-  }
-  // Otherwise show waiting on result page
-  mgShowWaitingResult(game);
-}
-
-function mgHandleRematch(data){
-  var game=data.game||MG_ONLINE.game;
-  if(MG_RESTART_PENDING){
-    // I already clicked — opponent just confirmed — launch!
-    mgDoRelaunch(game);
-  } else {
-    // Opponent clicked first — store it and wait for me
-    MG_ONLINE._oppWantsRematch = true;
-    toast('🔄 '+(MG_ONLINE.oppName||'Adversaire')+' veut rejouer ! Cliquez Rejouer.');
-  }
-}
-
 function mgCreateRoom(game){
   if(!U){toast(t('toast_please_login'));G('pg-login');return;}
-  // Check mini-game online unlock — each game separate
-  if(!isAdmin()&&!isMgGameUnlocked(game)){
-    showMgGameUnlock(game);
-    return;
-  }
-  // Check session cost (15 coins per game)
+  // Accept master code OR coins (like NationRush online)
   if(!isAdmin()&&(U.coins||0)<MG_ONLINE.cost){toast(t('toast_not_enough_coins'));return;}
   MG_ONLINE.game=game;
   MG_ONLINE.role='host';
@@ -10300,10 +10192,6 @@ function mgCreateRoom(game){
 
 function mgJoinRoom(game){
   if(!U){toast(t('toast_please_login'));G('pg-login');return;}
-  if(!isAdmin()&&!isMgGameUnlocked(game)){
-    showMgGameUnlock(game);
-    return;
-  }
   if(!isAdmin()&&(U.coins||0)<MG_ONLINE.cost){toast(t('toast_not_enough_coins'));return;}
   MG_ONLINE.game=game;
   MG_ONLINE.role='guest';
@@ -10464,9 +10352,6 @@ function mgInitChannel(){
     MG_ONLINE.channel.on('broadcast',{event:'mg_end'},function(payload){
       // Opponent signals game end
     });
-    MG_ONLINE.channel.on('broadcast',{event:'mg_rematch'},function(payload){
-      mgHandleRematch(payload.payload);
-    });
     MG_ONLINE.channel.subscribe();
   }catch(e){}
 }
@@ -10582,7 +10467,9 @@ function mgMorpionEnd(result){
   var isDraw=(result==='draw');
   var coins=iWon?10:isDraw?2:0; // Gagnant +10, nul +2, perdant 0 (a déjà perdu 15)
   if(coins>0&&U){addCoins(coins);syncMiniCoins();}
-  // Keep channel OPEN for rematch — only close when user clicks Menu
+  mgCloseChannel();
+  // Delete room
+  if(MG_ONLINE.roomCode) sbFetch('nr_rooms?code=eq.'+MG_ONLINE.roomCode,{method:'DELETE',prefer:'return=minimal'}).catch(function(){});
   var el=document.getElementById('mo-result');
   el.style.display='flex';
   document.getElementById('mo-result-icon').textContent=isDraw?'🤝':iWon?'🏆':'❌';
@@ -10711,7 +10598,8 @@ function mgDamierEnd(winner){
   var iWon=(winner===DA.myPlayer);
   var coins=iWon?10:0; // Gagnant +10, perdant 0 (a déjà perdu 15)
   if(coins>0&&U){addCoins(coins);syncMiniCoins();}
-  // Keep channel OPEN for rematch — only close when user clicks Menu
+  mgCloseChannel();
+  if(MG_ONLINE.roomCode) sbFetch('nr_rooms?code=eq.'+MG_ONLINE.roomCode,{method:'DELETE',prefer:'return=minimal'}).catch(function(){});
   var el=document.getElementById('da-result');
   el.style.display='flex';
   document.getElementById('da-result-icon').textContent=iWon?'🏆':'❌';
@@ -11006,22 +10894,13 @@ function goEndGame(winner){
 
 function resetGomoku(){
   document.getElementById('go-result').style.display = 'none';
-  if(GO.mode==='online'){
-    mgRestartOnline('gomoku');
-  } else {
-    startGomoku(GO.mode);
-  }
+  startGomoku(GO.mode);
 }
 
 function closeGoResult(){
   document.getElementById('go-result').style.display = 'none';
   document.getElementById('go-setup').style.display = 'block';
   document.getElementById('go-game').style.display = 'none';
-  if(GO.mode==='online'){
-    mgCloseChannel();
-    if(MG_ONLINE.roomCode) sbFetch('nr_rooms?code=eq.'+MG_ONLINE.roomCode,{method:'DELETE',prefer:'return=minimal'}).catch(function(){});
-    MG_ONLINE.roomCode=null;
-  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -11185,48 +11064,6 @@ tetStart = function(){
   var speeds = {easy:1200, normal:800, hard:300};
   TET.dropInterval = speeds[diff] || 800;
 };
-
-// ── Bouton "Cacher pub" — détecte bannière Adsterra en haut ──
-var _hideAdTimer = null;
-function hideAdBanner(){
-  // Trouver les iframes ou divs Adsterra en haut de l'écran
-  var adEls = document.querySelectorAll('iframe, ins, div[id*="astra"], div[id*="adster"]');
-  var found = false;
-  adEls.forEach(function(el){
-    var rect = el.getBoundingClientRect();
-    if(rect.top < 150 && rect.height > 20 && rect.width > 100){
-      el.style.display = 'none';
-      found = true;
-      // Remettre après 10 secondes
-      if(_hideAdTimer) clearTimeout(_hideAdTimer);
-      _hideAdTimer = setTimeout(function(){
-        el.style.display = '';
-        var btn = document.getElementById('btn-hide-ad');
-        if(btn) btn.style.display = 'block';
-      }, 10000);
-    }
-  });
-  // Aussi masquer via padding-top du body
-  document.body.style.paddingTop = '0';
-  var btn = document.getElementById('btn-hide-ad');
-  if(btn) btn.style.display = 'none';
-}
-
-// Vérifier si une bannière est visible en haut — afficher le bouton
-function checkAdVisible(){
-  var btn = document.getElementById('btn-hide-ad');
-  if(!btn) return;
-  var adEls = document.querySelectorAll('iframe, ins');
-  var visible = false;
-  adEls.forEach(function(el){
-    var rect = el.getBoundingClientRect();
-    if(rect.top < 150 && rect.height > 20 && rect.width > 100 && el.style.display !== 'none'){
-      visible = true;
-    }
-  });
-  btn.style.display = visible ? 'block' : 'none';
-}
-setInterval(checkAdVisible, 2000);
 </script>
 <!-- Modal master code pour affilies -->
 <div id="aff-mc-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);
