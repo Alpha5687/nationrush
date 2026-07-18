@@ -10330,22 +10330,30 @@ async function mgCreateRoom(game){
   MG_ONLINE.active=false;
   G('pg-mg-online');
   syncMiniCoins();
-  // Reset entire page before showing
+  // Show loading state first
   var _mgNames={morpion:t('morpion_title'),gomoku:t('gomoku_title'),damier:t('damier_title')};
   document.getElementById('mg-online-title').textContent=_mgNames[game]||game;
   document.getElementById('mg-host-view').style.display='block';
   document.getElementById('mg-guest-view').style.display='none';
-  document.getElementById('mg-room-code-display').textContent=MG_ONLINE.roomCode;
+  document.getElementById('mg-room-code-display').textContent='...';
   document.getElementById('mg-guest-joined').style.display='none';
   document.getElementById('mg-start-btn').style.display='none';
   document.getElementById('mg-ol-coins').textContent=U.coins||0;
-  // Wait for room to be saved in Supabase BEFORE showing code
+  // Save room in Supabase FIRST, then show code
   var saved = await mgSaveRoom();
   if(!saved && saved !== true){
-    // Retry once
-    await new Promise(function(r){setTimeout(r,500);});
-    await mgSaveRoom();
+    // Retry with 1 second delay
+    await new Promise(function(res){setTimeout(res,1000);});
+    saved = await mgSaveRoom();
   }
+  if(!saved && saved !== true){
+    // Still failed - show error
+    document.getElementById('mg-room-code-display').textContent='ERREUR';
+    toast('❌ Erreur de connexion. Réessayez.');
+    return;
+  }
+  // Show code only after successful save
+  document.getElementById('mg-room-code-display').textContent=MG_ONLINE.roomCode;
   mgStartHostPoll();
 }
 
