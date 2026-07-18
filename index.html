@@ -10276,19 +10276,23 @@ function mgDoRelaunch(game){
 
 function mgRestartOnline(game){
   MG_RESTART_PENDING = true;
+  // Include winner info so both players know who starts next
+  var winnerInfo = {
+    morpionWinner: MO.lastWinner||null,
+    damierWinner: DA.lastWinner||null
+  };
   // Re-init channel if needed (may have been closed)
   if(!MG_ONLINE.channel && MG_ONLINE.roomCode){
     mgInitChannel();
-    // Wait a moment for channel to connect then send
     setTimeout(function(){
       if(MG_ONLINE.channel){
-        try{ MG_ONLINE.channel.send({type:'broadcast',event:'mg_rematch',payload:{game:game}}); }catch(e){}
+        try{ MG_ONLINE.channel.send({type:'broadcast',event:'mg_rematch',payload:{game:game,winner:winnerInfo}}); }catch(e){}
       }
     }, 800);
   } else if(MG_ONLINE.channel){
     try{
       MG_ONLINE.channel.send({type:'broadcast',event:'mg_rematch',
-        payload:{game:game}});
+        payload:{game:game,winner:winnerInfo}});
     }catch(e){}
   }
   // If opponent already clicked rematch (their signal arrived first)
@@ -10303,11 +10307,14 @@ function mgRestartOnline(game){
 
 function mgHandleRematch(data){
   var game=data.game||MG_ONLINE.game;
+  // Apply winner info from opponent
+  if(data.winner){
+    if(data.winner.morpionWinner) MO.lastWinner=data.winner.morpionWinner;
+    if(data.winner.damierWinner) DA.lastWinner=data.winner.damierWinner;
+  }
   if(MG_RESTART_PENDING){
-    // I already clicked — opponent just confirmed — launch!
     mgDoRelaunch(game);
   } else {
-    // Opponent clicked first — store it and wait for me
     MG_ONLINE._oppWantsRematch = true;
     toast('🔄 '+(MG_ONLINE.oppName||'Adversaire')+' veut rejouer ! Cliquez Rejouer.');
   }
@@ -11451,7 +11458,8 @@ var BT = {
   players:[], bullets:[], enemies:[], walls:[],
   wave:1, score:0, gameOver:false,
   joystick:{active:false,dx:0,dy:0,startX:0,startY:0},
-  fireActive:false, fireTimer:null
+  fireActive:false, fireTimer:null,
+  victories:0  // Tracks wins to increase difficulty progressively
 };
 
 // Constants per level
@@ -11983,14 +11991,22 @@ function btUpdateHUD(){
 function btEndGame(won){
   BT.running=false;
   if(BT.loop){clearInterval(BT.loop);BT.loop=null;}
+  if(won){
+    BT.victories++;
+    // Every 2 wins, increase level (max 5)
+    if(BT.victories % 2 === 0){
+      BT.level = Math.min(5, BT.level + 1);
+    }
+  }
   var coins=won?20:Math.floor(BT.score/20);
   if(coins>0&&U){addCoins(coins);syncMiniCoins();}
   mgCountGame(); // Ad counter
   var el=document.getElementById('bt-result');
   el.style.display='flex';
   document.getElementById('bt-result-icon').textContent=won?'🏆':'💀';
-  document.getElementById('bt-result-text').textContent=won?t('battle_win'):t('battle_lost');
-  document.getElementById('bt-result-wave').textContent='Vague '+BT.wave+' • Score: '+BT.score;
+  var winMsg = won?(t('battle_win')+(BT.victories%2===0&&won?' ⬆️ Niv.'+BT.level:'')):(t('battle_lost'));
+  document.getElementById('bt-result-text').textContent=winMsg;
+  document.getElementById('bt-result-wave').textContent='Vague '+BT.wave+' • Score: '+BT.score+' • Niv.'+BT.level;
   document.getElementById('bt-result-coins').textContent=coins>0?'+'+coins+' 🪙':'';
 }
 
@@ -12001,6 +12017,10 @@ function btStop(){
 
 function btRestart(){
   document.getElementById('bt-result').style.display='none';
+  // Update level display
+  var lvEl=document.getElementById('bt-level');
+  if(lvEl) lvEl.textContent=BT.level;
+  // btInit() calls btGenerateWalls() which picks new random layout+theme
   btInit();
 }
 
@@ -12121,21 +12141,40 @@ async function btOnlineCreate(){
   BT_ONLINE.mySlot=0;
   BT_ONLINE.players=[{email:U.email,name:U.name||U.email,slot:0,ready:true}];
   try{
-    await sbFetch('nr_rooms?on_conflict=code',{
+    var saved = await sbFetch('nr_rooms?on_conflict=code',{
       method:'POST',prefer:'resolution=merge-duplicates,return=minimal',
       body:{
         code:BT_ONLINE.roomCode,
         type:'bt_'+BT_ONLINE.mode+'_'+BT_ONLINE.numPlayers,
-        host_email:U.email,host_name:U.name||U.email,
+        host_email:U.email, host_name:U.name||U.email,
+        guest_email:null, guest_name:null,
+        max_players:BT_ONLINE.numPlayers,
+        players:JSON.stringify(BT_ONLINE.players),
         status:'waiting',
-        host_taps:BT_ONLINE.numPlayers,
-        guest_taps:0,
         host_country:JSON.stringify(BT_ONLINE.players),
         guest_country:null,
+        host_taps:BT_ONLINE.numPlayers,
+        guest_taps:0,
         created_at:new Date().toISOString(),
         updated_at:new Date().toISOString()
       }
     });
+    if(!saved && saved!==true){
+      // Retry once
+      await new Promise(function(r){setTimeout(r,800);});
+      await sbFetch('nr_rooms?on_conflict=code',{
+        method:'POST',prefer:'resolution=merge-duplicates,return=minimal',
+        body:{
+          code:BT_ONLINE.roomCode, type:'bt_'+BT_ONLINE.mode+'_'+BT_ONLINE.numPlayers,
+          host_email:U.email, host_name:U.name||U.email,
+          guest_email:null, guest_name:null,
+          max_players:BT_ONLINE.numPlayers, players:JSON.stringify(BT_ONLINE.players),
+          status:'waiting', host_country:JSON.stringify(BT_ONLINE.players),
+          guest_country:null, host_taps:BT_ONLINE.numPlayers, guest_taps:0,
+          created_at:new Date().toISOString(), updated_at:new Date().toISOString()
+        }
+      });
+    }
   }catch(e){}
   // Deduct coins
   if(!isAdmin()){U.coins=(U.coins||0)-BT_ONLINE.cost;saveU();syncMiniCoins();}
@@ -12867,10 +12906,15 @@ function btHandleOpponentMove(data){
       <!-- Create or Join -->
       <div style="color:#8899AA;font-size:.75rem;letter-spacing:2px;margin-bottom:8px">REJOINDRE OU CRÉER</div>
       <button onclick="btOnlineCreate()" style="width:100%;margin-bottom:8px;background:rgba(100,181,246,.15);border:2px solid rgba(100,181,246,.4);color:#64B5F6;padding:12px;border-radius:12px;cursor:pointer;font-weight:700">🌐 Créer une Room <span style="font-size:.7rem;color:#8899AA">15🪙</span></button>
-      <div style="display:flex;gap:8px">
-        <input id="bton-join-code" type="text" maxlength="6" placeholder="CODE" style="flex:1;text-align:center;font-size:1.2rem;font-weight:900;letter-spacing:4px;color:#FFD700;background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.2);border-radius:10px;padding:10px;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
-        <button onclick="btOnlineJoin()" style="background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.3);color:#FFD700;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700">🔗</button>
-      </div>
+      <div style="margin-bottom:8px;color:#8899AA;font-size:.75rem;letter-spacing:1px">OU REJOINDRE AVEC UN CODE</div>
+      <input id="bton-join-code" type="text" maxlength="6" placeholder="XXXXXX"
+        style="width:100%;text-align:center;font-size:1.8rem;font-weight:900;letter-spacing:8px;
+        color:#FFD700;background:rgba(255,215,0,.05);border:2px solid rgba(255,215,0,.3);
+        border-radius:12px;padding:12px;box-sizing:border-box;text-transform:uppercase;margin-bottom:10px"
+        oninput="this.value=this.value.toUpperCase()">
+      <button onclick="btOnlineJoin()" style="width:100%;background:rgba(0,230,118,.15);
+        border:2px solid rgba(0,230,118,.4);color:#00E676;padding:14px;border-radius:12px;
+        cursor:pointer;font-size:1rem;font-weight:900">🔗 REJOINDRE</button>
 
       <!-- Waiting room -->
       <div id="bton-waiting" style="display:none;margin-top:14px;background:rgba(255,255,255,.04);border-radius:12px;padding:12px;text-align:center">
