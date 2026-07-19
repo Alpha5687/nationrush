@@ -10230,6 +10230,7 @@ var MG_ONLINE = {
 // ── Mini-game online unlock — chaque jeu séparé (200 coins ou Master Code) ──
 function isMgGameUnlocked(game){
   if(isAdmin()) return true;
+  if(game==='battle') return true; // Battle online always accessible
   var key = 'nr_mg_online_'+game;
   return localStorage.getItem(key) === '1' ||
          !!(U && U.unlockedModes && U.unlockedModes['mg-online-'+game]);
@@ -10338,7 +10339,7 @@ async function mgCreateRoom(game){
   G('pg-mg-online');
   syncMiniCoins();
   // Show loading state first
-  var _mgNames={morpion:t('morpion_title'),gomoku:t('gomoku_title'),damier:t('damier_title')};
+  var _mgNames={morpion:t('morpion_title'),gomoku:t('gomoku_title'),damier:t('damier_title'),battle:t('battle_title')};
   document.getElementById('mg-online-title').textContent=_mgNames[game]||game;
   document.getElementById('mg-host-view').style.display='block';
   document.getElementById('mg-guest-view').style.display='none';
@@ -10494,7 +10495,7 @@ async function mgConfirmJoin(){
     // Update title with CORRECT game name after code confirmed
     var titleEl = document.getElementById('mg-online-title');
     if(titleEl){
-      var gameName = detectedGame==='morpion'?t('morpion_title'):detectedGame==='gomoku'?t('gomoku_title'):t('damier_title');
+      var gameName = detectedGame==='morpion'?t('morpion_title'):detectedGame==='gomoku'?t('gomoku_title'):detectedGame==='battle'?t('battle_title'):t('damier_title');
       titleEl.textContent = gameName;
     }
     document.getElementById('mg-join-status').textContent='✅ Rejoint ! En attente du lancement...';
@@ -10549,6 +10550,8 @@ function mgLaunchGame(){
     mgLaunchGomoku();
   } else if(MG_ONLINE.game==='damier'){
     mgLaunchDamier();
+  } else if(MG_ONLINE.game==='battle'){
+    mgLaunchBattle();
   }
 }
 
@@ -10648,6 +10651,26 @@ function moPlayOnline(i){
   updateMoStatusOnline();
 }
 
+
+// ── Battle Online via mg system ──
+function mgLaunchBattle(){
+  // Set up BT_ONLINE from MG_ONLINE
+  BT_ONLINE.roomCode = MG_ONLINE.roomCode;
+  BT_ONLINE.role = MG_ONLINE.role;
+  BT_ONLINE.mySlot = MG_ONLINE.role==='host'?0:1;
+  BT_ONLINE.players = [{email:U.email,name:MG_ONLINE.myName,slot:BT_ONLINE.mySlot}];
+  BT_ONLINE.mode = 'pvp';
+  BT_ONLINE.numPlayers = 2;
+  // Close mg-online page, go to battle
+  G('pg-battle');
+  document.getElementById('bt-setup').style.display='none';
+  document.getElementById('bt-game').style.display='block';
+  document.getElementById('bt-result').style.display='none';
+  btInitOnline();
+  // Init realtime channel
+  btInitOnlineChannel();
+}
+
 function mgHandleOpponentMove(data){
   if(!data||!data.type) return;
   if(data.type==='morpion'){
@@ -10720,7 +10743,9 @@ function mgLaunchDamier(){
   DA.board=daInitBoard();
   DA.mode='online';
   DA.myPlayer=MG_ONLINE.role==='host'?1:2;
-  DA.turn=1; DA.selected=null; DA.validMoves=[]; DA.active=true;
+  // Winner of last game goes first; first game: host (player 1) starts
+  DA.turn=DA.lastWinner||1;
+  DA.selected=null; DA.validMoves=[]; DA.active=true;
   DA.scores={1:0,2:0};
   document.getElementById('da-setup').style.display='none';
   document.getElementById('da-game').style.display='block';
@@ -11478,6 +11503,11 @@ function btLevelConfig(lv){
 
 // Navigation
 function goBattle(){ tetPause(); G('pg-battle'); syncMiniCoins(); btSetLevel(1); }
+function btGoOnline(){
+  if(!U){toast(t('toast_please_login'));G('pg-login');return;}
+  if(!isAdmin()&&(U.coins||0)<15){toast(t('toast_not_enough_coins'));return;}
+  mgCreateRoom('battle');
+}
 function battleExit(){
   btStop();
   document.getElementById('bt-setup').style.display='block';
@@ -12835,7 +12865,7 @@ function btHandleOpponentMove(data){
     <button onclick="btStartMode('coop')" style="width:100%;margin-bottom:10px;background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.25);color:#00E676;padding:14px;border-radius:12px;font-size:1rem;cursor:pointer">
       👥 <span data-tr="battle_coop">Coopératif vs IA</span>
     </button>
-    <button onclick="btShowOnlineSetup()" style="width:100%;margin-bottom:10px;background:rgba(100,181,246,.08);border:1px solid rgba(100,181,246,.25);color:#64B5F6;padding:14px;border-radius:12px;font-size:1rem;cursor:pointer">
+    <button onclick="btGoOnline()" style="width:100%;margin-bottom:10px;background:rgba(100,181,246,.08);border:1px solid rgba(100,181,246,.25);color:#64B5F6;padding:14px;border-radius:12px;font-size:1rem;cursor:pointer">
       🌐 <span data-tr="battle_online">Online PvP</span>
     </button>
 
