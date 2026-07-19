@@ -5,6 +5,90 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
+<script>
+// ── PROTECTION ANTI-REDIRECT MALVEILLANT ──
+// Bloque les redirections automatiques (sans clic utilisateur)
+// Les pubs normales fonctionnent — seuls les redirects forcés sont bloqués
+(function(){
+  'use strict';
+
+  // Liste de domaines malveillants connus
+  var BLOCKED_DOMAINS = [
+    'guardnanoai.com','guard-nano','clickaine','trafficjunky',
+    'propellerads','adcash','popcash','plugrush',
+    'juicyads','exoclick','hilltopads'
+  ];
+
+  // Bloquer window.open automatique (sans clic)
+  var _userClicking = false;
+  document.addEventListener('mousedown', function(){ _userClicking=true; }, true);
+  document.addEventListener('touchstart', function(){ _userClicking=true; }, true);
+  document.addEventListener('mouseup', function(){ setTimeout(function(){ _userClicking=false; },500); }, true);
+  document.addEventListener('touchend', function(){ setTimeout(function(){ _userClicking=false; },500); }, true);
+
+  var _origOpen = window.open;
+  window.open = function(url, name, features){
+    if(!_userClicking){
+      console.log('[BLOCKED] Auto popup blocked:', url);
+      return null; // Bloquer ouverture automatique
+    }
+    // Vérifier domaines malveillants
+    if(url && typeof url === 'string'){
+      for(var i=0; i<BLOCKED_DOMAINS.length; i++){
+        if(url.indexOf(BLOCKED_DOMAINS[i]) >= 0){
+          console.log('[BLOCKED] Malicious domain blocked:', url);
+          return null;
+        }
+      }
+    }
+    return _origOpen.apply(this, arguments);
+  };
+
+  // Bloquer les redirections automatiques via location
+  var _lastLocationChange = 0;
+  function guardLocation(){
+    var desc = Object.getOwnPropertyDescriptor(window, 'location');
+    if(desc && !desc.configurable) return;
+    try{
+      Object.defineProperty(window, 'location', {
+        get: function(){ return window.location; },
+        set: function(url){
+          if(!_userClicking){
+            console.log('[BLOCKED] Auto redirect blocked:', url);
+            return;
+          }
+          window.location.href = url;
+        },
+        configurable: true
+      });
+    }catch(e){}
+  }
+
+  // Intercepter les iframes suspectes
+  var _MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+  if(_MutationObserver){
+    var observer = new _MutationObserver(function(mutations){
+      mutations.forEach(function(m){
+        m.addedNodes.forEach(function(node){
+          if(node.tagName === 'IFRAME'){
+            var src = node.src || '';
+            for(var i=0; i<BLOCKED_DOMAINS.length; i++){
+              if(src.indexOf(BLOCKED_DOMAINS[i]) >= 0){
+                console.log('[BLOCKED] Malicious iframe removed:', src);
+                node.remove();
+              }
+            }
+          }
+        });
+      });
+    });
+    document.addEventListener('DOMContentLoaded', function(){
+      observer.observe(document.body, {childList:true, subtree:true});
+    });
+  }
+
+})();
+</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Carida Rush</title>
 
@@ -10664,10 +10748,16 @@ function mgLaunchBattle(){
   // Set up BT_ONLINE from MG_ONLINE
   BT_ONLINE.roomCode = MG_ONLINE.roomCode;
   BT_ONLINE.role = MG_ONLINE.role;
-  BT_ONLINE.mySlot = MG_ONLINE.role==='host'?0:1;
-  BT_ONLINE.players = [{email:U.email,name:MG_ONLINE.myName,slot:BT_ONLINE.mySlot}];
   BT_ONLINE.mode = 'pvp';
   BT_ONLINE.numPlayers = 2;
+  var mySlot = MG_ONLINE.role==='host'?0:1;
+  var oppSlot = mySlot===0?1:0;
+  BT_ONLINE.mySlot = mySlot;
+  // Create both players — me + opponent placeholder
+  var players = [null,null];
+  players[mySlot]  = {email:U.email,           name:MG_ONLINE.myName,                    slot:mySlot};
+  players[oppSlot] = {email:MG_ONLINE.oppName||'Adversaire', name:MG_ONLINE.oppName||'Adversaire', slot:oppSlot};
+  BT_ONLINE.players = players;
   // Close mg-online page, go to battle
   G('pg-battle');
   document.getElementById('bt-setup').style.display='none';
@@ -12083,6 +12173,40 @@ function btSetupControls(){
   var knob=document.getElementById('bt-joystick-knob');
   if(!joyArea) return;
 
+  // ── Keyboard controls for PC ──
+  var _keys={};
+  document.addEventListener('keydown',function(e){
+    _keys[e.key]=true;
+    // Space or Enter = fire
+    if(e.key===' '||e.key==='Enter'){ BT.fireActive=true; e.preventDefault(); }
+  });
+  document.addEventListener('keyup',function(e){
+    _keys[e.key]=false;
+    if(e.key===' '||e.key==='Enter') BT.fireActive=false;
+  });
+  // Update joystick from keys every tick
+  var _keyInterval=setInterval(function(){
+    if(!BT.running){ clearInterval(_keyInterval); return; }
+    var dx=0,dy=0;
+    if(_keys['ArrowLeft']||_keys['a']||_keys['A']) dx=-1;
+    if(_keys['ArrowRight']||_keys['d']||_keys['D']) dx=1;
+    if(_keys['ArrowUp']||_keys['w']||_keys['W']) dy=-1;
+    if(_keys['ArrowDown']||_keys['s']||_keys['S']) dy=1;
+    if(dx!==0||dy!==0){
+      var len=Math.sqrt(dx*dx+dy*dy)||1;
+      BT.joystick.dx=dx/len; BT.joystick.dy=dy/len;
+    } else {
+      BT.joystick.dx=0; BT.joystick.dy=0;
+    }
+  },30);
+
+  // Mouse click = fire on PC
+  var canvas=document.getElementById('bt-canvas');
+  if(canvas){
+    canvas.addEventListener('mousedown',function(){ BT.fireActive=true; });
+    canvas.addEventListener('mouseup',function(){ BT.fireActive=false; });
+  }
+
   joyArea.ontouchstart=function(e){
     e.preventDefault();
     var t=e.touches[0];
@@ -12492,7 +12616,7 @@ function btTickOnline(){
 var _btLastBroadcast=0;
 function btBroadcastMyState(p, withFire){
   var now=Date.now();
-  if(!withFire && now-_btLastBroadcast<100) return;
+  if(!withFire && now-_btLastBroadcast<50) return; // 50ms = 20fps updates
   _btLastBroadcast=now;
   if(!BT_ONLINE.channel) return;
   try{
@@ -12531,9 +12655,12 @@ function btHandleOpponentMove(data){
   if(!data||data.slot===undefined) return;
   var p=BT.players[data.slot];
   if(!p||p.isMe) return;
+  // Update opponent position
   p.x=data.x; p.y=data.y;
-  p.hp=data.hp; p.angle=data.angle;
-  p.alive=data.alive;
+  p.hp=data.hp||p.hp; p.angle=data.angle||0;
+  p.alive=(data.alive!==undefined)?data.alive:p.alive;
+  // Redraw immediately to show opponent
+  btDraw();
   if(data.fire){
     // Show opponent's bullet
     btFireBullet({x:p.x,y:p.y,angle:p.angle},false);
