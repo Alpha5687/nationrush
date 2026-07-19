@@ -10723,6 +10723,8 @@ function goPlaceOnline(r, c){
 function mgMorpionEnd(result){
   MO.active=false;
   mgCountGame();
+  // Save winner — goes first next game
+  if(result!=='draw') MO.lastWinner=result; // 'X' or 'O'
   var iWon=(result!=='draw')&&(result===MO.mySymbol);
   var isDraw=(result==='draw');
   var coins=iWon?10:isDraw?2:0; // Gagnant +10, nul +2, perdant 0 (a déjà perdu 15)
@@ -10857,6 +10859,8 @@ function daApplyMoveOnline(mv,isMe){
 function mgDamierEnd(winner){
   DA.active=false;
   mgCountGame();
+  // Save winner so they go first in next game
+  if(winner) DA.lastWinner=winner;
   var iWon=(winner===DA.myPlayer);
   var coins=iWon?10:0; // Gagnant +10, perdant 0 (a déjà perdu 15)
   if(coins>0&&U){addCoins(coins);syncMiniCoins();}
