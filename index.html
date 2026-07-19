@@ -9904,6 +9904,8 @@ function startDamier(mode){
   DA.mode=mode;
   DA.board=daInitBoard();
   // Winner of last game goes first; first game: player 1 (white) starts
+  // Load winner from localStorage if not in memory
+  if(!DA.lastWinner){try{DA.lastWinner=parseInt(localStorage.getItem('nr_da_winner'))||null;}catch(e){}}
   DA.turn=DA.lastWinner||1;
   DA.selected=null; DA.validMoves=[]; DA.active=true;
   DA.scores={1:0,2:0};
@@ -10336,6 +10338,9 @@ async function mgCreateRoom(game){
   MG_ONLINE.myName=U.name||U.email;
   MG_ONLINE.oppName=null;
   MG_ONLINE.active=false;
+  // Reset winner tracking for new room (first game: host goes first)
+  MO.lastWinner=null; DA.lastWinner=null;
+  try{localStorage.removeItem('nr_mo_winner');localStorage.removeItem('nr_da_winner');}catch(e){}
   G('pg-mg-online');
   syncMiniCoins();
   // Show loading state first
@@ -10614,6 +10619,8 @@ function mgLaunchMorpion(){
   MO.mode='online';
   MO.mySymbol=MG_ONLINE.role==='host'?'X':'O';
   // Winner of last game starts; first game: X starts
+  // Load winner from localStorage if not in memory
+  if(!MO.lastWinner){try{MO.lastWinner=localStorage.getItem('nr_mo_winner')||null;}catch(e){}}
   MO.current=MO.lastWinner||'X';
   MO.active=true;
   document.getElementById('mo-setup').style.display='none';
@@ -10860,7 +10867,10 @@ function mgDamierEnd(winner){
   DA.active=false;
   mgCountGame();
   // Save winner so they go first in next game
-  if(winner) DA.lastWinner=winner;
+  if(winner){
+    DA.lastWinner=winner;
+    try{localStorage.setItem('nr_da_winner',winner);}catch(e){}
+  }
   var iWon=(winner===DA.myPlayer);
   var coins=iWon?10:0; // Gagnant +10, perdant 0 (a déjà perdu 15)
   if(coins>0&&U){addCoins(coins);syncMiniCoins();}
@@ -11511,6 +11521,11 @@ function btGoOnline(){
   if(!U){toast(t('toast_please_login'));G('pg-login');return;}
   if(!isAdmin()&&(U.coins||0)<15){toast(t('toast_not_enough_coins'));return;}
   mgCreateRoom('battle');
+}
+function btJoinOnline(){
+  if(!U){toast(t('toast_please_login'));G('pg-login');return;}
+  if(!isAdmin()&&(U.coins||0)<15){toast(t('toast_not_enough_coins'));return;}
+  mgJoinRoom('battle');
 }
 function battleExit(){
   btStop();
@@ -12869,8 +12884,12 @@ function btHandleOpponentMove(data){
     <button onclick="btStartMode('coop')" style="width:100%;margin-bottom:10px;background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.25);color:#00E676;padding:14px;border-radius:12px;font-size:1rem;cursor:pointer">
       👥 <span data-tr="battle_coop">Coopératif vs IA</span>
     </button>
-    <button onclick="btGoOnline()" style="width:100%;margin-bottom:10px;background:rgba(100,181,246,.08);border:1px solid rgba(100,181,246,.25);color:#64B5F6;padding:14px;border-radius:12px;font-size:1rem;cursor:pointer">
-      🌐 <span data-tr="battle_online">Online PvP</span>
+    <div style="font-size:.75rem;letter-spacing:2px;color:#8899AA;margin:10px 0 6px;text-align:left">🌐 ONLINE PvP</div>
+    <button onclick="btGoOnline()" style="width:100%;margin-bottom:8px;background:rgba(100,181,246,.1);border:1px solid rgba(100,181,246,.3);color:#64B5F6;padding:14px;border-radius:12px;font-size:1rem;cursor:pointer">
+      🌐 <span data-tr="mg_create_room">Créer une Room</span> <span style="font-size:.75rem;color:#8899AA">15🪙</span>
+    </button>
+    <button onclick="btJoinOnline()" style="width:100%;margin-bottom:10px;background:rgba(0,100,255,.07);border:1px solid rgba(0,100,255,.2);color:#90CAF9;padding:12px;border-radius:12px;font-size:.95rem;cursor:pointer">
+      🔗 <span data-tr="mg_join_room">Rejoindre avec code</span>
     </button>
 
     <!-- Level selector -->
